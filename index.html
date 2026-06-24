@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>因果API 文档</title>
+<title>因果API - AI 模型统一接口文档</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
   --primary-hover: #1d4ed8;
   --primary-glow: rgba(37, 99, 235, 0.08);
   --accent: #059669;
+  --accent-light: #ecfdf5;
   --text: #1e293b;
   --text-secondary: #4b5563;
   --text-dim: #8896a8;
@@ -52,80 +53,67 @@ a:hover { color: var(--primary-hover); }
 /* ===== SIDEBAR ===== */
 .sidebar {
   width: var(--sidebar-w);
-  min-width: var(--sidebar-w);
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border);
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  overflow-y: auto;
-  z-index: 100;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
 }
 
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
-
-.sidebar-brand {
-  padding: 24px 24px 20px;
+.sidebar-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
-.sidebar-brand a {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.brand-icon {
-  width: 34px; height: 34px;
-  background: linear-gradient(135deg, #2563eb, #06b6d4);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; font-weight: 800;
-  color: #fff;
-  letter-spacing: -0.5px;
-}
-
-.brand-text {
+.sidebar-header h1 {
   font-size: 18px;
   font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.3px;
+  margin-bottom: 4px;
 }
 
-.brand-text span { color: var(--primary); }
+.sidebar-header p {
+  font-size: 12px;
+  color: var(--text-dim);
+}
 
-/* Search */
 .sidebar-search {
-  padding: 0 20px 16px;
+  padding: 16px 20px;
   flex-shrink: 0;
 }
 
 .sidebar-search input {
   width: 100%;
-  padding: 8px 12px 8px 34px;
+  padding: 10px 14px 10px 38px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
   font-family: inherit;
   background: #fff;
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
 }
 
-.sidebar-search input:focus { border-color: var(--primary); }
+.sidebar-search input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
 .sidebar-search input::placeholder { color: var(--text-faint); }
 
 .sidebar-search .search-icon {
   position: absolute;
-  left: 30px;
+  left: 34px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-faint);
-  font-size: 14px;
+  font-size: 16px;
   pointer-events: none;
 }
 
@@ -135,10 +123,10 @@ a:hover { color: var(--primary-hover); }
   overflow-y: auto;
 }
 
-.nav-section { margin-bottom: 2px; }
+.nav-section { margin-bottom: 4px; }
 
 .nav-section-title {
-  padding: 10px 24px;
+  padding: 12px 24px;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -147,7 +135,7 @@ a:hover { color: var(--primary-hover); }
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   user-select: none;
   transition: color 0.15s;
 }
@@ -155,7 +143,7 @@ a:hover { color: var(--primary-hover); }
 .nav-section-title:hover { color: var(--text-secondary); }
 
 .nav-section-title svg {
-  width: 14px; height: 14px;
+  width: 16px; height: 16px;
   transition: transform 0.2s;
 }
 
@@ -166,7 +154,7 @@ a:hover { color: var(--primary-hover); }
 
 .nav-item a {
   display: block;
-  padding: 7px 24px 7px 36px;
+  padding: 8px 24px 8px 40px;
   font-size: 13px;
   color: var(--text-dim);
   text-decoration: none;
@@ -199,145 +187,127 @@ a:hover { color: var(--primary-hover); }
 
 .sidebar-footer a:hover { color: var(--text); }
 
-/* ===== MOBILE ===== */
-.sidebar-toggle {
-  display: none;
-  position: fixed;
-  top: 12px; left: 12px;
-  z-index: 200;
-  width: 40px; height: 40px;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-size: 18px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-sm);
-}
-
-.sidebar-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.3);
-  z-index: 99;
-}
-
 /* ===== MAIN ===== */
 .main {
-  margin-left: var(--sidebar-w);
   flex: 1;
-  min-width: 0;
-  padding: 56px 64px 80px;
-  max-width: 920px;
+  margin-left: var(--sidebar-w);
+  padding: 40px 48px;
+  max-width: 1000px;
 }
 
-/* ===== HERO ===== */
-.hero {
-  margin-bottom: 56px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid var(--border);
-}
-
-.hero-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  background: var(--primary-light);
-  color: var(--primary);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  margin-bottom: 16px;
-}
-
-.hero h1 {
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.8px;
-  line-height: 1.3;
-  margin-bottom: 12px;
-}
-
-.hero p {
-  font-size: 16px;
-  color: var(--text-secondary);
-  max-width: 600px;
-  line-height: 1.7;
-}
-
-/* ===== SECTION ===== */
 .doc-section {
-  margin-bottom: 64px;
-  scroll-margin-top: 32px;
+  margin-bottom: 48px;
+  scroll-margin-top: 24px;
 }
 
 .section-title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 8px;
-  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .section-title .hash {
-  color: var(--text-faint);
+  color: var(--primary);
+  font-size: 20px;
   font-weight: 400;
-  margin-right: 6px;
 }
 
 .section-desc {
   font-size: 15px;
   color: var(--text-secondary);
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+  line-height: 1.8;
 }
 
-/* ===== SUBSECTION ===== */
-.subsection {
-  margin: 40px 0 32px;
-  scroll-margin-top: 32px;
-}
-
-.subsection-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 14px;
-  padding-bottom: 0;
-}
-
-.subsection-title .hash {
-  color: var(--text-faint);
-  font-weight: 400;
-  margin-right: 6px;
-}
-
-/* ===== CARD ===== */
+/* ===== CARDS ===== */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
 }
 
 .card-title {
+  font-size: 16px;
   font-weight: 600;
-  font-size: 15px;
   color: var(--text);
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* ===== TABLE ===== */
-.table-wrap {
-  overflow-x: auto;
-  margin: 16px 0;
+.method {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.method-get { background: #dbeafe; color: #1d4ed8; }
+.method-post { background: #dcfce7; color: #16a34a; }
+.method-put { background: #fef3c7; color: #d97706; }
+.method-delete { background: #fee2e2; color: #dc2626; }
+
+/* ===== CODE BLOCKS ===== */
+.code-block {
+  position: relative;
+  background: var(--bg-code);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.code-block pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre;
+  margin: 0;
+}
+
+.code-block .lang-tag {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 60px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.15s;
+}
+
+.code-block:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { color: var(--text); border-color: var(--text-dim); }
+
+/* ===== TABLES ===== */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 16px 0;
 }
 
 table {
@@ -347,780 +317,395 @@ table {
 }
 
 th {
-  background: var(--bg-card);
-  padding: 11px 16px;
   text-align: left;
+  padding: 12px 16px;
+  background: var(--bg-sidebar);
+  border-bottom: 2px solid var(--border);
   font-weight: 600;
-  color: var(--text-dim);
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  color: var(--text);
   white-space: nowrap;
-  border-bottom: 1px solid var(--border);
 }
 
 td {
-  padding: 10px 16px;
-  border-top: 1px solid var(--border-light);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
   color: var(--text-secondary);
 }
 
-tr:first-child td { border-top: none; }
+tr:last-child td { border-bottom: none; }
 
 td code, th code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12.5px;
-  background: #eef2ff;
-  padding: 2px 6px;
-  border-radius: 3px;
-  color: #4f46e5;
-}
-
-/* ===== CODE BLOCK ===== */
-.code-block {
-  background: #1e293b;
-  border-radius: var(--radius);
-  margin: 16px 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.code-block .lang-tag {
-  position: absolute;
-  top: 10px; right: 14px;
-  font-size: 10px;
-  font-family: 'JetBrains Mono', monospace;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.code-block .copy-btn {
-  position: absolute;
-  top: 8px; right: 64px;
-  font-size: 11px;
-  font-family: 'Inter', 'Noto Sans SC', sans-serif;
-  color: #94a3b8;
-  background: rgba(255,255,255,0.08);
-  border: none;
-  border-radius: 4px;
-  padding: 3px 10px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.code-block .copy-btn:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.16);
-}
-
-.code-block pre {
-  padding: 20px;
-  overflow-x: auto;
-  margin: 0;
-  font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
-  line-height: 1.75;
-  color: #e2e8f0;
+  padding: 2px 6px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  color: var(--primary);
 }
 
-.code-block pre .kw  { color: #c084fc; }
-.code-block pre .str { color: #86efac; }
-.code-block pre .cm  { color: #64748b; font-style: italic; }
-.code-block pre .fn  { color: #93c5fd; }
-.code-block pre .num { color: #fda4af; }
-.code-block pre .prop { color: #67e8f9; }
+/* ===== SUBSECTION ===== */
+.subsection {
+  margin-bottom: 32px;
+}
 
-/* ===== INLINE CODE ===== */
-:not(pre) > code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  background: #eef2ff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: #4f46e5;
+.subsection-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subsection-title .hash {
+  color: var(--text-dim);
+  font-size: 16px;
+  font-weight: 400;
 }
 
 /* ===== ALERTS ===== */
 .alert {
+  padding: 16px 20px;
   border-radius: var(--radius);
-  padding: 14px 18px;
   margin: 16px 0;
-  font-size: 13.5px;
-  line-height: 1.7;
-  border-left: 4px solid;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .alert-info {
   background: #eff6ff;
-  border-color: #3b82f6;
+  border-left: 4px solid #3b82f6;
   color: #1e40af;
 }
 
-.alert-warn {
+.alert-tip {
+  background: #ecfdf5;
+  border-left: 4px solid #10b981;
+  color: #065f46;
+}
+
+.alert-warning {
   background: #fffbeb;
-  border-color: #f59e0b;
+  border-left: 4px solid #f59e0b;
   color: #92400e;
 }
 
-.alert-danger {
-  background: #fef2f2;
-  border-color: #ef4444;
-  color: #991b1b;
-}
-
-.alert-tip {
-  background: #f0fdf4;
-  border-color: #22c55e;
-  color: #14532d;
-}
-
-.alert strong { color: inherit; }
-
-/* ===== STEPS ===== */
-.step-list { list-style: none; counter-reset: step; }
-
-.step-list li {
-  counter-increment: step;
-  padding: 14px 0 14px 44px;
-  position: relative;
-  border-left: 1px solid var(--border);
-  margin-left: 9px;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.step-list li::before {
-  content: counter(step);
-  position: absolute;
-  left: -15px; top: 14px;
-  width: 28px; height: 28px;
-  background: #fff;
-  border: 2px solid var(--primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.step-list li:last-child { border-left-color: transparent; }
-
-/* ===== FEATURE GRID ===== */
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
-  margin: 20px 0;
-}
-
-.feature-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-
-.feature-card:hover {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-glow);
-}
-
-.feature-card .icon {
-  width: 40px; height: 40px;
-  background: var(--primary-light);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  margin-bottom: 14px;
-}
-
-.feature-card h4 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-
-.feature-card p {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.6;
+.alert strong {
+  display: block;
+  margin-bottom: 4px;
 }
 
 /* ===== BADGES ===== */
 .badge {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.2px;
+  margin-left: 8px;
 }
 
-.badge-green { background: #dcfce7; color: #15803d; }
-.badge-blue  { background: #dbeafe; color: #1d4ed8; }
-.badge-red   { background: #fee2e2; color: #dc2626; }
+.badge-new { background: #dbeafe; color: #1d4ed8; }
+.badge-beta { background: #fef3c7; color: #d97706; }
+.badge-popular { background: #dcfce7; color: #16a34a; }
 
-/* ===== HTTP METHOD ===== */
-.method {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  margin-right: 8px;
+/* ===== MODEL GRID ===== */
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
 }
 
-.method-post { background: #dcfce7; color: #15803d; }
-.method-get  { background: #dbeafe; color: #1d4ed8; }
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s;
-  }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-toggle { display: flex; }
-  .sidebar-backdrop.show { display: block; }
-  .main {
-    margin-left: 0;
-    padding: 24px 20px 56px;
-  }
-  .hero h1 { font-size: 26px; }
-  .section-title { font-size: 22px; }
-  .feature-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 600px) {
-  .main { padding: 16px 14px 40px; }
-}
-
-/* ===== ANCHOR HIGHLIGHT ===== */
-:target {
-  animation: highlight 1.8s ease-out;
-}
-
-@keyframes highlight {
-  0%   { background: #eff4ff; }
-  100% { background: transparent; }
-}
-
-/* ===== RIGHT SIDEBAR TOC ===== */
-.content-wrapper {
-  display: flex;
-  gap: 0;
-}
-
-/* ===== TOC ===== */
-.toc-card {
+.model-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  margin-bottom: 32px;
+  padding: 20px;
+  transition: all 0.2s;
 }
 
-.toc-card .toc-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.model-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.model-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 12px;
 }
 
-.toc-card ul { list-style: none; }
-.toc-card li { margin: 3px 0; }
+.model-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+}
 
-.toc-card a {
+.model-provider {
+  font-size: 12px;
   color: var(--text-dim);
+  background: var(--bg-code);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.model-desc {
   font-size: 13px;
-  transition: color 0.15s;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
-.toc-card a:hover { color: var(--primary); }
-
-/* ===== SEARCH HIGHLIGHT ===== */
-.search-highlight { background: #fef08a; border-radius: 2px; }
-
-/* ===== DIVIDER ===== */
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 48px 0;
+.model-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-dim);
 }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); }
+  .main { margin-left: 0; padding: 24px; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
 </style>
 </head>
 <body>
 
-<!-- Mobile -->
-<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="菜单">☰</button>
-<div class="sidebar-backdrop" onclick="closeSidebar()"></div>
-
-<!-- ==================== SIDEBAR ==================== -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <a href="#">
-      <div class="brand-icon">因</div>
-      <div class="brand-text">因果<span>AI</span></div>
-    </a>
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>因果API</h1>
+    <p>AI 模型统一接口平台</p>
   </div>
 
-  <div class="sidebar-search" style="position:relative;">
-    <span class="search-icon" style="position:absolute;left:30px;top:50%;transform:translateY(-50%);color:#b0b8c4;font-size:14px;pointer-events:none;">🔍</span>
-    <input type="text" placeholder="搜索文档..." oninput="searchDocs(this.value)">
+  <div class="sidebar-search">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="搜索文档..." id="searchInput">
   </div>
 
-  <nav class="sidebar-nav" id="sidebarNav">
+  <nav class="sidebar-nav">
+    <!-- 快速开始 -->
     <div class="nav-section">
       <div class="nav-section-title" onclick="toggleSection(this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        开始使用
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        快速开始
       </div>
       <ul class="nav-items">
-        <li class="nav-item"><a href="#intro" data-search="项目介绍 因果API 是什么">项目介绍</a></li>
-        <li class="nav-item"><a href="#quickstart" data-search="快速开始 入门 三步 注册">快速开始</a></li>
-      </ul>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title" onclick="toggleSection(this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        使用指南
-      </div>
-      <ul class="nav-items">
-        <li class="nav-item"><a href="#get-key" data-search="获取 API Key 令牌 token 创建">获取 API Key</a></li>
-        <li class="nav-item"><a href="#models" data-search="模型列表 model gpt claude gemini">模型列表</a></li>
-        <li class="nav-item"><a href="#pricing" data-search="额度 计费 价格 pricing 费用">额度与计费</a></li>
-        <li class="nav-item"><a href="#best-practices" data-search="最佳实践 安全 性能 优化">最佳实践</a></li>
-      </ul>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title" onclick="toggleSection(this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        API 参考
-      </div>
-      <ul class="nav-items">
+        <li class="nav-item"><a href="#overview" data-search="概览 overview 简介">概览</a></li>
         <li class="nav-item"><a href="#auth" data-search="鉴权 认证 authorization bearer key">鉴权方式</a></li>
-        <li class="nav-item"><a href="#chat-completions" data-search="聊天补全 chat completions 对话 API">聊天补全</a></li>
-        <li class="nav-item"><a href="#gemini-native" data-search="Gemini 原生格式 generateContent streamGenerateContent">Gemini 原生格式</a></li>
-        <li class="nav-item"><a href="#image-gen" data-search="图像生成 image 画图 dalle">图像生成</a></li>
-        <li class="nav-item"><a href="#error-codes" data-search="错误码 error 400 401 429 500">错误码</a></li>
-        <li class="nav-item"><a href="#rate-limit" data-search="速率限制 rate limit 限流 429">速率限制</a></li>
+        <li class="nav-item"><a href="#base-url" data-search="基础地址 base_url 端点">基础地址</a></li>
       </ul>
     </div>
 
+    <!-- 核心接口 -->
     <div class="nav-section">
       <div class="nav-section-title" onclick="toggleSection(this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        其他
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        核心接口
       </div>
       <ul class="nav-items">
-        <li class="nav-item"><a href="#faq" data-search="常见问题 FAQ 问题 帮助">常见问题</a></li>
-        <li class="nav-item"><a href="#changelog" data-search="更新日志 changelog 版本 发布">更新日志</a></li>
+        <li class="nav-item"><a href="#chat" data-search="聊天 chat 对话 GPT Claude Gemini">聊天补全</a></li>
+        <li class="nav-item"><a href="#completions" data-search="补全 completions 文本生成">文本补全</a></li>
+        <li class="nav-item"><a href="#embeddings" data-search="嵌入 embeddings 向量 语义">文本嵌入</a></li>
+      </ul>
+    </div>
+
+    <!-- 多模态接口 -->
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        多模态接口
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#images" data-search="图像 images 画图 DALL-E Imagen">图像生成</a></li>
+        <li class="nav-item"><a href="#audio" data-search="音频 audio 语音识别 转录">音频处理</a></li>
+        <li class="nav-item"><a href="#speech" data-search="语音 speech 文字转语音 TTS">语音合成</a></li>
+        <li class="nav-item"><a href="#video" data-search="视频 video 视频生成">视频生成</a></li>
+      </ul>
+    </div>
+
+    <!-- 安全与审核 -->
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        安全与审核
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#moderations" data-search="审查 moderation 内容安全 审核">内容审查</a></li>
+      </ul>
+    </div>
+
+    <!-- 模型列表 -->
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        模型列表
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#models-chat" data-search="聊天模型 GPT Claude Gemini DeepSeek">聊天模型</a></li>
+        <li class="nav-item"><a href="#models-embedding" data-search="嵌入模型 embedding 向量模型">嵌入模型</a></li>
+        <li class="nav-item"><a href="#models-image" data-search="图像模型 DALL-E Imagen 图片生成">图像模型</a></li>
+        <li class="nav-item"><a href="#models-audio" data-search="音频模型 Whisper TTS 语音模型">音频模型</a></li>
+        <li class="nav-item"><a href="#models-video" data-search="视频模型 视频生成">视频模型</a></li>
+      </ul>
+    </div>
+
+    <!-- 参考 -->
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        参考
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#errors" data-search="错误码 error 400 401 429 500">错误码</a></li>
+        <li class="nav-item"><a href="#rate-limit" data-search="速率限制 rate limit 限流 429">速率限制</a></li>
+        <li class="nav-item"><a href="#faq" data-search="FAQ 常见问题">常见问题</a></li>
       </ul>
     </div>
   </nav>
 
   <div class="sidebar-footer">
-    <a href="https://causmatrix.xyz">← 返回首页</a>
-    <a href="https://github.com/jkpter/causmatrix-docs" target="_blank">GitHub</a>
-    <a href="mailto:support@causmatrix.xyz">联系支持</a>
+    <a href="#">控制台</a>
+    <a href="#">状态页</a>
+    <a href="#">GitHub</a>
   </div>
 </aside>
 
-<!-- ==================== MAIN CONTENT ==================== -->
+<!-- ===== MAIN CONTENT ===== -->
 <main class="main">
 
-<!-- ===== HERO ===== -->
-<div class="hero">
-  <div class="hero-badge">📖 API 文档</div>
-  <h1>因果API 开发文档</h1>
-  <p>因果API 是新一代 AI 模型中转服务平台，将多种大语言模型统一为 OpenAI 兼容格式。一个 API Key，调用全球主流 AI 模型。</p>
-</div>
-
-<!-- ===== INTRO ===== -->
-<section class="doc-section" id="intro">
-  <h2 class="section-title"><span class="hash">#</span> 项目介绍</h2>
-  <p class="section-desc">因果API 致力于提供稳定、快速、经济的 AI 模型 API 中转服务，让开发者只需接入一次，即可使用 OpenAI、Claude、Gemini、DeepSeek 等数十种主流大模型。</p>
-
-  <div class="feature-grid">
-    <div class="feature-card">
-      <div class="icon">🔌</div>
-      <h4>OpenAI 完全兼容</h4>
-      <p>与 OpenAI Chat Completions API 格式 100% 兼容，零改动迁移。</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">🌐</div>
-      <h4>多模型汇聚</h4>
-      <p>一个 API Key 访问 OpenAI、Claude、Gemini、DeepSeek 等数十种模型。</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">⚡</div>
-      <h4>低延迟加速</h4>
-      <p>全球节点优化，毫秒级响应，稳定可靠的企业级中转服务。</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">💰</div>
-      <h4>透明计费</h4>
-      <p>按量计费、无隐藏费用，实时查看每次调用的 Token 消耗与费用明细。</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">🔒</div>
-      <h4>安全可控</h4>
-      <p>支持 IP 白名单、API Key 细粒度权限控制，全方位保障调用安全。</p>
-    </div>
-    <div class="feature-card">
-      <div class="icon">📊</div>
-      <h4>用量可视</h4>
-      <p>控制台提供实时用量统计、费用趋势图表，数据一目了然。</p>
-    </div>
-  </div>
-</section>
-
-<!-- ===== QUICKSTART ===== -->
-<section class="doc-section" id="quickstart">
-  <h2 class="section-title"><span class="hash">#</span> 快速开始</h2>
-  <p class="section-desc">只需三步，即可通过因果API 调用全球 AI 大模型。</p>
-
-  <ol class="step-list">
-    <li>
-      <strong>注册账号</strong><br>
-      访问 <a href="https://causmatrix.xyz">causmatrix.xyz</a> 注册并登录你的因果API 账号。
-    </li>
-    <li>
-      <strong>获取 API Key</strong><br>
-      进入控制台 → 令牌管理，创建一个新的 API Key。<strong>请立即复制保存——Key 仅在创建时显示一次。</strong>
-    </li>
-    <li>
-      <strong>发起调用</strong><br>
-      将 <code>base_url</code> 设为 <code>https://api.causmatrix.xyz/v1</code>，搭配你的 API Key 即可调用。
-    </li>
-  </ol>
-
-  <div class="card">
-    <div class="card-title">📋 连接信息</div>
-    <table>
-      <tr><td style="width:140px;font-weight:500;">OpenAI API 地址</td><td><code>https://api.causmatrix.xyz/v1</code></td></tr>
-      <tr><td style="font-weight:500;">Gemini API 地址</td><td><code>https://api.causmatrix.xyz/v1beta</code></td></tr>
-      <tr><td style="font-weight:500;">接口格式</td><td>OpenAI 兼容 + Gemini 原生格式</td></tr>
-      <tr><td style="font-weight:500;">鉴权方式</td><td><code>Authorization: Bearer &lt;API-Key&gt;</code></td></tr>
-    </table>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> cURL</h3>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">bash</span>
-      <pre>curl https://api.causmatrix.xyz/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -d '{
-    "model": "gpt-4o",
-    "messages": [
-      {"role": "system", "content": "你是一个有帮助的助手。"},
-      {"role": "user", "content": "你好，请介绍一下自己。"}
-    ]
-  }'</pre>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> Python</h3>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">python</span>
-      <pre>from openai import OpenAI
-
-client = OpenAI(
-    api_key="YOUR_API_KEY",
-    base_url="https://api.causmatrix.xyz/v1"
-)
-
-response = client.chat.completions.create(
-    model="gpt-4o",
-    messages=[
-        {"role": "system", "content": "你是一个有帮助的助手。"},
-        {"role": "user", "content": "你好，请介绍一下自己。"}
-    ]
-)
-
-print(response.choices[0].message.content)</pre>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> JavaScript / Node.js</h3>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">javascript</span>
-      <pre>import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: "YOUR_API_KEY",
-  baseURL: "https://api.causmatrix.xyz/v1"
-});
-
-const response = await client.chat.completions.create({
-  model: "gpt-4o",
-  messages: [
-    { role: "system", content: "你是一个有帮助的助手。" },
-    { role: "user", content: "你好，请介绍一下自己。" }
-  ]
-});
-
-console.log(response.choices[0].message.content);</pre>
-    </div>
-  </div>
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> Gemini 配置</h3>
-    <p style="color:var(--text-secondary)">因果API 同时支持 Gemini 原生 API 格式。使用 Google 官方 Gemini SDK 或原生 API 时，推荐设置以下环境变量：</p>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">bash</span>
-      <pre>export GOOGLE_GEMINI_BASE_URL="https://api.causmatrix.xyz/v1beta"
-export GEMINI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export GEMINI_MODEL="gemini-2.5-flash"</pre>
-    </div>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">bash</span>
-      <pre>curl "https://api.causmatrix.xyz/v1beta/models/gemini-2.5-flash:generateContent" \
-  -H "Content-Type: application/json" \
-  -H "x-goog-api-key: YOUR_GEMINI_API_KEY" \
-  -d '{
-    "contents": [
-      {
-        "parts": [
-          {"text": "你好，请介绍一下自己。"}
-        ]
-      }
-    ]
-  }'</pre>
-    </div>
-  </div>
-</section>
-
-<!-- ===== GET API KEY ===== -->
-<section class="doc-section" id="get-key">
-  <h2 class="section-title"><span class="hash">#</span> 获取 API Key</h2>
-  <p class="section-desc">API Key 是调用因果API 服务的唯一凭证，请妥善保管。</p>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 创建令牌</h3>
-    <ol class="step-list">
-      <li>登录因果API，进入 <strong>控制台 → 令牌管理</strong></li>
-      <li>点击 <strong>新建令牌</strong></li>
-      <li>填写令牌名称、过期时间、额度限制、模型权限等信息</li>
-      <li>点击创建，<strong>立即复制 Key 并安全保存</strong></li>
-    </ol>
-    <div class="alert alert-danger">
-      <strong>⚠️ 重要：</strong>API Key 仅在创建时完整显示一次，关闭弹窗后无法再次查看。如果遗失，只能删除并重新创建。
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 令牌配置项</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>配置项</th><th>说明</th></tr></thead>
-        <tbody>
-          <tr><td>令牌名称</td><td>用于标识用途，如「生产环境」「个人测试」</td></tr>
-          <tr><td>过期时间</td><td>留空或设为 -1 表示永不过期</td></tr>
-          <tr><td>剩余额度</td><td>限制该令牌可消耗的最大金额，超出后自动失效</td></tr>
-          <tr><td>无限额度</td><td>开启后不受该令牌额度限制（仅受账户总余额约束）</td></tr>
-          <tr><td>模型限制</td><td>限定该令牌可调用的模型，留空不限制</td></tr>
-          <tr><td>IP 白名单</td><td>限制可访问的来源 IP，多个用逗号分隔</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 在请求中使用</h3>
-    <div class="code-block">
-      <span class="lang-tag">http</span>
-      <pre>Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
-    </div>
-  </div>
-</section>
-
-<!-- ===== MODELS ===== -->
-<section class="doc-section" id="models">
-  <h2 class="section-title"><span class="hash">#</span> 模型列表</h2>
-  <p class="section-desc">因果API 持续接入主流 AI 模型，以下为当前支持的模型列表。</p>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 对话模型</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>模型 ID</th><th>提供商</th><th>上下文</th><th>说明</th></tr></thead>
-        <tbody>
-          <tr><td><code>gpt-4o</code></td><td>OpenAI</td><td>128K</td><td>最新多模态旗舰模型</td></tr>
-          <tr><td><code>gpt-4o-mini</code></td><td>OpenAI</td><td>128K</td><td>轻量高效，高性价比</td></tr>
-          <tr><td><code>gpt-4-turbo</code></td><td>OpenAI</td><td>128K</td><td>GPT-4 Turbo</td></tr>
-          <tr><td><code>o3</code></td><td>OpenAI</td><td>200K</td><td>深度推理模型</td></tr>
-          <tr><td><code>o4-mini</code></td><td>OpenAI</td><td>200K</td><td>快速推理，成本更低</td></tr>
-          <tr><td><code>claude-opus-4-7</code></td><td>Anthropic</td><td>200K</td><td>Claude 旗舰模型</td></tr>
-          <tr><td><code>claude-sonnet-4-6</code></td><td>Anthropic</td><td>200K</td><td>性能与速度的平衡</td></tr>
-          <tr><td><code>claude-haiku-4-5</code></td><td>Anthropic</td><td>200K</td><td>极速响应</td></tr>
-          <tr><td><code>gemini-2.5-pro</code></td><td>Google</td><td>1M</td><td>超长上下文推理</td></tr>
-          <tr><td><code>gemini-2.5-flash</code></td><td>Google</td><td>1M</td><td>高速响应版</td></tr>
-          <tr><td><code>gemini-2.0-flash</code></td><td>Google</td><td>1M</td><td>稳定快速版</td></tr>
-          <tr><td><code>gemini-3-pro-preview</code></td><td>Google</td><td>1M</td><td>最新旗舰推理模型（预览版）</td></tr>
-          <tr><td><code>deepseek-v3</code></td><td>DeepSeek</td><td>128K</td><td>国产开源旗舰</td></tr>
-          <tr><td><code>deepseek-r1</code></td><td>DeepSeek</td><td>128K</td><td>深度思考推理</td></tr>
-          <tr><td><code>deepseek-v3.1</code></td><td>DeepSeek</td><td>128K</td><td>最新旗舰增强版</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 图像生成模型</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>模型 ID</th><th>提供商</th><th>说明</th></tr></thead>
-        <tbody>
-          <tr><td><code>dall-e-3</code></td><td>OpenAI</td><td>高质量图像生成</td></tr>
-          <tr><td><code>midjourney</code></td><td>Midjourney</td><td>艺术风格图像生成</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<!-- ===== OVERVIEW ===== -->
+<section class="doc-section" id="overview">
+  <h2 class="section-title"><span class="hash">#</span> 概览</h2>
+  <p class="section-desc">
+    因果API 是一个统一的 AI 模型接口平台，提供对 OpenAI、Anthropic、Google、DeepSeek 等主流 AI 模型的统一访问。
+    所有接口均兼容 OpenAI API 格式，只需修改 <code>base_url</code> 即可无缝切换。
+  </p>
 
   <div class="alert alert-info">
-    <strong>💡 提示：</strong>可使用 <code>GET /v1/models</code>（OpenAI格式）或 <code>GET /v1beta/models</code>（Gemini原生格式）接口获取当前可用的完整模型列表。更多模型持续接入中，请关注更新。
-  </div>
-</section>
-
-<!-- ===== PRICING ===== -->
-<section class="doc-section" id="pricing">
-  <h2 class="section-title"><span class="hash">#</span> 额度与计费</h2>
-  <p class="section-desc">因果API 采用按量计费模式，不同模型有不同的计费倍率。</p>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 计费规则</h3>
-    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
-      <li>账户充值后获得余额（人民币），1 元对应一定额度</li>
-      <li>不同模型有不同倍率，具体以控制台实时显示为准</li>
-      <li>费用 =（输入 Token × 输入价格 + 输出 Token × 输出价格）× 倍率</li>
-      <li>在控制台 → 日志中可查看每次请求的详细扣费记录</li>
-    </ul>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> Token 估算参考</h3>
-    <div class="card">
-      <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
-        <li>英文：1 Token ≈ 0.75 个单词 / 约 4 个字符</li>
-        <li>中文：1 Token ≈ 1 个汉字</li>
-        <li>代码：1 Token ≈ 3~4 个字符</li>
-        <li>一篇 1000 字的中文文章 ≈ 1000 tokens</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ===== BEST PRACTICES ===== -->
-<section class="doc-section" id="best-practices">
-  <h2 class="section-title"><span class="hash">#</span> 最佳实践</h2>
-  <p class="section-desc">遵循以下建议，获得更安全、高效的使用体验。</p>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 安全建议</h3>
-    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
-      <li><strong>不要</strong>在前端代码中直接暴露 API Key——始终通过后端代理转发</li>
-      <li>为不同环境创建独立的令牌（开发 / 测试 / 生产）</li>
-      <li>启用 IP 白名单，限制可访问的来源 IP</li>
-      <li>定期轮换 API Key，降低泄露风险</li>
-      <li>设置合理的额度上限，防止意外超支</li>
-    </ul>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 性能优化</h3>
-    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
-      <li>使用流式输出（<code>stream: true</code>）减少首字等待时间</li>
-      <li>合理设置 <code>max_tokens</code>，避免不必要的长输出</li>
-      <li>复用 HTTP 连接（Keep-Alive），减少握手开销</li>
-      <li>请求失败时实现指数退避重试策略</li>
+    <strong>💡 核心优势</strong>
+    <ul style="margin:8px 0 0 20px;">
+      <li>一个 API Key 调用所有模型</li>
+      <li>完全兼容 OpenAI SDK</li>
+      <li>支持流式输出（SSE）</li>
+      <li>更低的价格，更高的稳定性</li>
     </ul>
   </div>
 </section>
-
-<hr class="divider">
 
 <!-- ===== AUTH ===== -->
 <section class="doc-section" id="auth">
   <h2 class="section-title"><span class="hash">#</span> 鉴权方式</h2>
-  <p class="section-desc">所有 API 请求均需在 Header 中携带 API Key 进行身份验证。</p>
+  <p class="section-desc">所有 API 请求需要在 HTTP Header 中携带 API Key 进行身份验证。</p>
 
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> Bearer Token（推荐）</h3>
-    <p style="color:var(--text-secondary)">在 HTTP Header 中添加 <code>Authorization</code> 字段，与 OpenAI 官方完全一致：</p>
+  <div class="card">
+    <div class="card-title">🔑 请求头格式</div>
     <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">http</span>
-      <pre>Authorization: Bearer YOUR_API_KEY</pre>
+      <pre>Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
     </div>
   </div>
 
-  <div class="alert alert-warn">
-    <strong>⚠️ 注意：</strong>鉴权失败时返回 <code>401 Unauthorized</code>。请检查 Key 是否正确、是否已过期、额度是否已耗尽。
+  <div class="card">
+    <div class="card-title">📋 获取 API Key</div>
+    <ol style="list-style:decimal;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+      <li>访问 <a href="#">控制台</a> 并登录</li>
+      <li>进入「令牌管理」页面</li>
+      <li>点击「创建新令牌」</li>
+      <li>复制生成的 API Key（以 <code>sk-</code> 开头）</li>
+    </ol>
+  </div>
+
+  <div class="alert alert-warning">
+    <strong>⚠️ 安全提示</strong>
+    请妥善保管你的 API Key，不要将其泄露到公开代码仓库或客户端代码中。
+  </div>
+</section>
+
+<!-- ===== BASE URL ===== -->
+<section class="doc-section" id="base-url">
+  <h2 class="section-title"><span class="hash">#</span> 基础地址</h2>
+  <p class="section-desc">所有 API 请求使用统一的基础地址，通过路径区分不同的服务类型。</p>
+
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>服务类型</th><th>接口地址</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><strong>聊天补全</strong></td><td><code>https://api.causmatrix.xyz/v1/chat/completions</code></td><td>多模型对话接口</td></tr>
+        <tr><td><strong>文本补全</strong></td><td><code>https://api.causmatrix.xyz/v1/completions</code></td><td>文本续写接口</td></tr>
+        <tr><td><strong>文本嵌入</strong></td><td><code>https://api.causmatrix.xyz/v1/embeddings</code></td><td>文本转向量接口</td></tr>
+        <tr><td><strong>图像生成</strong></td><td><code>https://api.causmatrix.xyz/v1/images/generations</code></td><td>文生图接口</td></tr>
+        <tr><td><strong>图像编辑</strong></td><td><code>https://api.causmatrix.xyz/v1/images/edits</code></td><td>图像编辑接口</td></tr>
+        <tr><td><strong>音频转录</strong></td><td><code>https://api.causmatrix.xyz/v1/audio/transcriptions</code></td><td>语音转文字接口</td></tr>
+        <tr><td><strong>音频翻译</strong></td><td><code>https://api.causmatrix.xyz/v1/audio/translations</code></td><td>音频翻译接口</td></tr>
+        <tr><td><strong>语音合成</strong></td><td><code>https://api.causmatrix.xyz/v1/audio/speech</code></td><td>文字转语音接口</td></tr>
+        <tr><td><strong>视频生成</strong></td><td><code>https://api.causmatrix.xyz/v1/video/generations</code></td><td>文生视频接口</td></tr>
+        <tr><td><strong>内容审查</strong></td><td><code>https://api.causmatrix.xyz/v1/moderations</code></td><td>内容安全审核接口</td></tr>
+        <tr><td><strong>模型列表</strong></td><td><code>https://api.causmatrix.xyz/v1/models</code></td><td>获取可用模型列表</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>💡 提示</strong>
+    所有接口均支持 OpenAI SDK，只需将 <code>base_url</code> 设置为 <code>https://api.causmatrix.xyz/v1</code> 即可。
   </div>
 </section>
 
 <!-- ===== CHAT COMPLETIONS ===== -->
-<section class="doc-section" id="chat-completions">
+<section class="doc-section" id="chat">
   <h2 class="section-title"><span class="hash">#</span> 聊天补全</h2>
-  <p class="section-desc">核心对话接口，兼容 OpenAI Chat Completions API 格式。</p>
+  <p class="section-desc">支持多轮对话的聊天接口，兼容 OpenAI Chat Completions 格式。支持 GPT-4o、Claude、Gemini、DeepSeek 等主流模型。</p>
 
   <div class="card">
     <div class="card-title">
       <span class="method method-post">POST</span> <code>/v1/chat/completions</code>
+      <span class="badge badge-popular">热门</span>
     </div>
-    <p style="color:var(--text-secondary);font-size:14px;">向 AI 模型发送对话消息并获取回复。</p>
   </div>
 
   <div class="subsection">
     <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
-    <div class="table-wrap">
+    <div class="table-wrapper">
       <table>
         <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
         <tbody>
-          <tr><td><code>model</code></td><td>string</td><td>✅</td><td>模型 ID，如 <code>gpt-4o</code></td></tr>
-          <tr><td><code>messages</code></td><td>array</td><td>✅</td><td>对话消息列表，每条含 <code>role</code> 和 <code>content</code></td></tr>
-          <tr><td><code>temperature</code></td><td>number</td><td>—</td><td>采样温度 0~2，默认 1。越高越随机</td></tr>
-          <tr><td><code>top_p</code></td><td>number</td><td>—</td><td>核采样 0~1，默认 1</td></tr>
-          <tr><td><code>max_tokens</code></td><td>integer</td><td>—</td><td>最大输出 Token 数</td></tr>
-          <tr><td><code>stream</code></td><td>boolean</td><td>—</td><td>是否流式输出，默认 false</td></tr>
-          <tr><td><code>stop</code></td><td>string/array</td><td>—</td><td>停止词，遇到即停止生成</td></tr>
-          <tr><td><code>tools</code></td><td>array</td><td>—</td><td>函数调用工具定义</td></tr>
-          <tr><td><code>tool_choice</code></td><td>string/object</td><td>—</td><td>工具调用策略</td></tr>
-          <tr><td><code>response_format</code></td><td>object</td><td>—</td><td>输出格式，如 JSON 模式</td></tr>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>模型 ID，如 <code>gpt-4o</code>、<code>claude-sonnet-4-6</code></td></tr>
+          <tr><td><code>messages</code></td><td>array</td><td>是</td><td>消息数组，包含 role 和 content</td></tr>
+          <tr><td><code>temperature</code></td><td>number</td><td>否</td><td>采样温度，0-2，默认 1</td></tr>
+          <tr><td><code>max_tokens</code></td><td>integer</td><td>否</td><td>最大生成 token 数</td></tr>
+          <tr><td><code>stream</code></td><td>boolean</td><td>否</td><td>是否流式输出，默认 false</td></tr>
+          <tr><td><code>top_p</code></td><td>number</td><td>否</td><td>核采样参数，默认 1</td></tr>
+          <tr><td><code>frequency_penalty</code></td><td>number</td><td>否</td><td>频率惩罚，-2 到 2</td></tr>
+          <tr><td><code>presence_penalty</code></td><td>number</td><td>否</td><td>存在惩罚，-2 到 2</td></tr>
+          <tr><td><code>tools</code></td><td>array</td><td>否</td><td>可用工具列表（Function Calling）</td></tr>
+          <tr><td><code>tool_choice</code></td><td>string/object</td><td>否</td><td>工具选择策略</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 消息角色</h3>
-    <div class="table-wrap">
+    <h3 class="subsection-title"><span class="hash">#</span> 消息格式</h3>
+    <div class="table-wrapper">
       <table>
         <thead><tr><th>角色</th><th>说明</th></tr></thead>
         <tbody>
-          <tr><td><code>system</code></td><td>系统提示词，设定助手行为与角色</td></tr>
-          <tr><td><code>user</code></td><td>用户消息</td></tr>
-          <tr><td><code>assistant</code></td><td>助手回复（多轮对话中回传）</td></tr>
+          <tr><td><code>system</code></td><td>系统提示词，设定 AI 行为</td></tr>
+          <tr><td><code>user</code></td><td>用户输入</td></tr>
+          <tr><td><code>assistant</code></td><td>AI 回复</td></tr>
           <tr><td><code>tool</code></td><td>工具调用结果</td></tr>
         </tbody>
       </table>
@@ -1128,14 +713,56 @@ export GEMINI_MODEL="gemini-2.5-flash"</pre>
   </div>
 
   <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    base_url="https://api.causmatrix.xyz/v1"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "你是一个有用的助手"},
+        {"role": "user", "content": "你好，请介绍一下自己"}
+    ],
+    temperature=0.7,
+    max_tokens=1000
+)
+
+print(response.choices[0].message.content)</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [
+      {"role": "system", "content": "你是一个有用的助手"},
+      {"role": "user", "content": "你好，请介绍一下自己"}
+    ],
+    "temperature": 0.7
+  }'</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
     <h3 class="subsection-title"><span class="hash">#</span> 流式输出</h3>
-    <p style="color:var(--text-secondary)">设置 <code>"stream": true</code> 启用 SSE（Server-Sent Events）流式输出：</p>
+    <p style="color:var(--text-secondary);margin-bottom:12px;">设置 <code>stream: true</code> 启用 SSE 流式输出：</p>
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">python</span>
       <pre>stream = client.chat.completions.create(
     model="gpt-4o",
-    messages=[{"role": "user", "content": "讲个故事"}],
+    messages=[{"role": "user", "content": "写一首诗"}],
     stream=True
 )
 
@@ -1146,253 +773,1112 @@ for chunk in stream:
   </div>
 
   <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 响应格式</h3>
-    <div class="code-block">
-      <span class="lang-tag">json</span>
-      <pre>{
-  "id": "chatcmpl-xxxxxxxx",
-  "object": "chat.completion",
-  "created": 1700000000,
-  "model": "gpt-4o",
-  "choices": [{
-    "index": 0,
-    "message": {
-      "role": "assistant",
-      "content": "你好！我是因果API 助手..."
-    },
-    "finish_reason": "stop"
-  }],
-  "usage": {
-    "prompt_tokens": 20,
-    "completion_tokens": 15,
-    "total_tokens": 35
-  }
-}</pre>
-    </div>
-  </div>
-</section>
-
-<!-- ===== GEMINI NATIVE ===== -->
-<section class="doc-section" id="gemini-native">
-  <h2 class="section-title"><span class="hash">#</span> Gemini 原生格式</h2>
-  <p class="section-desc">因果API 兼容 Google Gemini 原生 API 格式。使用 Gemini 模型时，可选用此格式调用，享受 Gemini 特有的功能特性（如 Grounding、Thinking 等）。</p>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 列出模型</h3>
-    <div class="card">
-      <div class="card-title">
-        <span class="method method-get">GET</span> <code>/v1beta/models</code>
-      </div>
-      <p style="color:var(--text-secondary);font-size:14px;">返回当前可用模型列表（Gemini 原生响应格式）。</p>
-    </div>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">bash</span>
-      <pre>curl "https://api.causmatrix.xyz/v1beta/models" \
-  -H "x-goog-api-key: YOUR_API_KEY"</pre>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 生成内容</h3>
-    <div class="card">
-      <div class="card-title">
-        <span class="method method-post">POST</span> <code>/v1beta/models/{model}:generateContent</code>
-      </div>
-      <p style="color:var(--text-secondary);font-size:14px;">向指定 Gemini 模型发送内容并获取生成结果。</p>
-    </div>
-
-    <h4 style="font-weight:600;font-size:14px;color:var(--text);margin:18px 0 8px;">请求参数</h4>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
-        <tbody>
-          <tr><td><code>model</code></td><td>string</td><td>✅</td><td>路径参数，模型 ID，如 <code>gemini-2.5-flash</code></td></tr>
-          <tr><td><code>contents</code></td><td>array</td><td>✅</td><td>对话内容数组，每项含 <code>parts</code> 和可选的 <code>role</code></td></tr>
-          <tr><td><code>systemInstruction</code></td><td>object</td><td>—</td><td>系统指令，格式同 <code>contents</code></td></tr>
-          <tr><td><code>generationConfig</code></td><td>object</td><td>—</td><td>生成配置，含 <code>temperature</code>、<code>topP</code>、<code>maxOutputTokens</code> 等</td></tr>
-          <tr><td><code>tools</code></td><td>array</td><td>—</td><td>工具定义，如 Google Search grounding</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 流式生成</h3>
-    <div class="card">
-      <div class="card-title">
-        <span class="method method-post">POST</span> <code>/v1beta/models/{model}:streamGenerateContent</code>
-      </div>
-      <p style="color:var(--text-secondary);font-size:14px;">SSE 流式输出，参数与 <code>generateContent</code> 相同。</p>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 鉴权方式</h3>
-    <p style="color:var(--text-secondary)">Gemini 原生格式支持两种鉴权方式：</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>方式</th><th>Header</th><th>说明</th></tr></thead>
-        <tbody>
-          <tr><td>x-goog-api-key</td><td><code>x-goog-api-key: YOUR_API_KEY</code></td><td>与 Google 官方一致，推荐</td></tr>
-          <tr><td>Bearer Token</td><td><code>Authorization: Bearer YOUR_API_KEY</code></td><td>与 OpenAI 格式统一</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 调用示例</h3>
-    <div class="code-block">
-      <span class="copy-btn" onclick="copyCode(this)">复制</span>
-      <span class="lang-tag">bash</span>
-      <pre>curl "https://api.causmatrix.xyz/v1beta/models/gemini-2.5-flash:generateContent" \
-  -H "Content-Type: application/json" \
-  -H "x-goog-api-key: YOUR_API_KEY" \
-  -d '{
-    "systemInstruction": {
-      "parts": [{"text": "你是一个有帮助的助手。"}]
-    },
-    "contents": [
-      {
-        "role": "user",
-        "parts": [{"text": "你好，请介绍一下自己。"}]
-      }
-    ],
-    "generationConfig": {
-      "temperature": 0.7,
-      "maxOutputTokens": 1024
-    }
-  }'</pre>
-    </div>
+    <h3 class="subsection-title"><span class="hash">#</span> 多模态输入</h3>
+    <p style="color:var(--text-secondary);margin-bottom:12px;">支持图片和文本混合输入（适用于 GPT-4o、Gemini 等多模态模型）：</p>
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">python</span>
-      <pre>import os
-from google import genai
-
-client = genai.Client(
-    api_key=os.environ["GEMINI_API_KEY"],
-    http_options={"base_url": "https://api.causmatrix.xyz/v1beta"}
-)
-
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="你好，请介绍一下自己。",
-    config={
-        "system_instruction": "你是一个有帮助的助手。",
-        "temperature": 0.7,
-        "max_output_tokens": 1024,
-    }
-)
-
-print(response.text)</pre>
+      <pre>response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "这张图片里有什么？"},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": "https://example.com/image.jpg"}
+                }
+            ]
+        }
+    ]
+)</pre>
     </div>
   </div>
 
   <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 响应格式</h3>
+    <h3 class="subsection-title"><span class="hash">#</span> Function Calling</h3>
+    <p style="color:var(--text-secondary);margin-bottom:12px;">支持工具调用，让模型能够调用外部函数：</p>
     <div class="code-block">
-      <span class="lang-tag">json</span>
-      <pre>{
-  "candidates": [{
-    "content": {
-      "parts": [{"text": "你好！我是 Gemini 助手..."}],
-      "role": "model"
-    },
-    "finishReason": "STOP",
-    "safetyRatings": [
-      {"category": "HARM_CATEGORY_HARASSMENT", "probability": "NEGLIGIBLE"}
-    ]
-  }],
-  "usageMetadata": {
-    "promptTokenCount": 10,
-    "candidatesTokenCount": 20,
-    "totalTokenCount": 30
-  }
-}</pre>
-    </div>
-  </div>
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "获取指定城市的天气信息",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "description": "城市名称"
+                    }
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
 
-  <div class="alert alert-info">
-    <strong>💡 提示：</strong>Gemini 原生格式保留 Google Gemini API 的全部特性，包括 <code>thinking</code> 推理模式、<code>grounding</code> 搜索增强等功能。具体参数请参考 <a href="https://ai.google.dev/gemini-api/docs" target="_blank">Google Gemini API 官方文档</a>。
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "北京今天天气怎么样？"}],
+    tools=tools,
+    tool_choice="auto"
+)</pre>
+    </div>
   </div>
 </section>
 
-<!-- ===== IMAGE GEN ===== -->
-<section class="doc-section" id="image-gen">
-  <h2 class="section-title"><span class="hash">#</span> 图像生成</h2>
-  <p class="section-desc">兼容 OpenAI Images API 格式，通过文本描述生成图像。</p>
+<!-- ===== COMPLETIONS ===== -->
+<section class="doc-section" id="completions">
+  <h2 class="section-title"><span class="hash">#</span> 文本补全</h2>
+  <p class="section-desc">传统的文本续写接口，适用于文本补全、代码补全等场景。</p>
 
   <div class="card">
     <div class="card-title">
-      <span class="method method-post">POST</span> <code>/v1/images/generations</code>
+      <span class="method method-post">POST</span> <code>/v1/completions</code>
     </div>
   </div>
 
   <div class="subsection">
     <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
-    <div class="table-wrap">
+    <div class="table-wrapper">
       <table>
         <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
         <tbody>
-          <tr><td><code>model</code></td><td>string</td><td>✅</td><td>模型 ID，如 <code>dall-e-3</code></td></tr>
-          <tr><td><code>prompt</code></td><td>string</td><td>✅</td><td>图像描述文本</td></tr>
-          <tr><td><code>n</code></td><td>integer</td><td>—</td><td>生成数量，默认 1</td></tr>
-          <tr><td><code>size</code></td><td>string</td><td>—</td><td>图像尺寸，如 <code>1024x1024</code></td></tr>
-          <tr><td><code>quality</code></td><td>string</td><td>—</td><td>质量：<code>standard</code> / <code>hd</code></td></tr>
-          <tr><td><code>style</code></td><td>string</td><td>—</td><td>风格：<code>vivid</code> / <code>natural</code></td></tr>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>模型 ID</td></tr>
+          <tr><td><code>prompt</code></td><td>string/array</td><td>是</td><td>输入文本</td></tr>
+          <tr><td><code>max_tokens</code></td><td>integer</td><td>否</td><td>最大生成 token 数</td></tr>
+          <tr><td><code>temperature</code></td><td>number</td><td>否</td><td>采样温度</td></tr>
+          <tr><td><code>top_p</code></td><td>number</td><td>否</td><td>核采样参数</td></tr>
+          <tr><td><code>stream</code></td><td>boolean</td><td>否</td><td>是否流式输出</td></tr>
+          <tr><td><code>stop</code></td><td>string/array</td><td>否</td><td>停止序列</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 调用示例</h3>
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.completions.create(
+    model="gpt-4o",
+    prompt="写一个 Python 函数来计算斐波那契数列：\n\ndef fibonacci(",
+    max_tokens=200,
+    temperature=0.3
+)
+
+print(response.choices[0].text)</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EMBEDDINGS ===== -->
+<section class="doc-section" id="embeddings">
+  <h2 class="section-title"><span class="hash">#</span> 文本嵌入</h2>
+  <p class="section-desc">将文本转换为向量表示，用于语义搜索、文本相似度计算、聚类分析等场景。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/embeddings</code>
+      <span class="badge badge-popular">热门</span>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>嵌入模型 ID</td></tr>
+          <tr><td><code>input</code></td><td>string/array</td><td>是</td><td>要嵌入的文本或文本数组</td></tr>
+          <tr><td><code>encoding_format</code></td><td>string</td><td>否</td><td>返回格式：<code>float</code> 或 <code>base64</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input="因果API 是一个统一的 AI 模型接口平台"
+)
+
+# 获取向量
+embedding = response.data[0].embedding
+print(f"向量维度: {len(embedding)}")
+print(f"前5个值: {embedding[:5]}")</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre># 批量嵌入
+response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=[
+        "第一段文本",
+        "第二段文本",
+        "第三段文本"
+    ]
+)
+
+# 获取所有向量
+for item in response.data:
+    print(f"Index {item.index}: {len(item.embedding)} 维")</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 语义搜索示例</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>import numpy as np
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+# 获取查询和文档的向量
+query_embedding = client.embeddings.create(
+    model="text-embedding-3-small",
+    input="如何使用 API？"
+).data[0].embedding
+
+doc_embeddings = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=["API 使用指南", "快速入门教程", "常见问题解答"]
+).data
+
+# 计算相似度
+for doc in doc_embeddings:
+    similarity = cosine_similarity(query_embedding, doc.embedding)
+    print(f"文档 {doc.index}: 相似度 {similarity:.4f}")</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== IMAGES ===== -->
+<section class="doc-section" id="images">
+  <h2 class="section-title"><span class="hash">#</span> 图像生成</h2>
+  <p class="section-desc">支持文本生成图像、图像编辑、图像变体等功能。支持 DALL-E 3、Stable Diffusion、Imagen 等主流图像模型。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/images/generations</code>
+      <span class="badge badge-popular">热门</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">根据文本描述生成图像。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>图像模型 ID，如 <code>dall-e-3</code></td></tr>
+          <tr><td><code>prompt</code></td><td>string</td><td>是</td><td>图像描述文本</td></tr>
+          <tr><td><code>n</code></td><td>integer</td><td>否</td><td>生成数量，1-10，默认 1</td></tr>
+          <tr><td><code>size</code></td><td>string</td><td>否</td><td>图像尺寸：<code>1024x1024</code>、<code>1792x1024</code>、<code>1024x1792</code></td></tr>
+          <tr><td><code>quality</code></td><td>string</td><td>否</td><td>质量：<code>standard</code> 或 <code>hd</code></td></tr>
+          <tr><td><code>style</code></td><td>string</td><td>否</td><td>风格：<code>vivid</code> 或 <code>natural</code></td></tr>
+          <tr><td><code>response_format</code></td><td>string</td><td>否</td><td>返回格式：<code>url</code> 或 <code>b64_json</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">python</span>
       <pre>response = client.images.generate(
     model="dall-e-3",
-    prompt="一只坐在电脑前的橘猫，赛博朋克风格",
+    prompt="一只可爱的橘猫坐在窗台上，阳光洒进来，温馨的氛围",
+    size="1024x1024",
+    quality="hd",
+    style="vivid",
+    n=1
+)
+
+image_url = response.data[0].url
+print(f"图像 URL: {image_url}")</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -d '{
+    "model": "dall-e-3",
+    "prompt": "一只可爱的橘猫坐在窗台上",
+    "size": "1024x1024",
+    "n": 1
+  }'</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/images/edits</code>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">根据提示编辑现有图像。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 图像编辑示例</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.images.edit(
+    model="dall-e-2",
+    image=open("original.png", "rb"),
+    mask=open("mask.png", "rb"),
+    prompt="在遮罩区域添加一朵红色的花",
     n=1,
     size="1024x1024"
 )
 
-print(response.data[0].url)</pre>
+edited_url = response.data[0].url</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/images/variations</code>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">生成图像的变体。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 图像变体示例</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.images.create_variation(
+    model="dall-e-2",
+    image=open("original.png", "rb"),
+    n=3,
+    size="1024x1024"
+)
+
+for i, img in enumerate(response.data):
+    print(f"变体 {i+1}: {img.url}")</pre>
     </div>
   </div>
 </section>
 
-<!-- ===== ERROR CODES ===== -->
-<section class="doc-section" id="error-codes">
-  <h2 class="section-title"><span class="hash">#</span> 错误码</h2>
-  <p class="section-desc">API 使用标准 HTTP 状态码，并在响应体中返回详细错误说明。</p>
+<!-- ===== AUDIO ===== -->
+<section class="doc-section" id="audio">
+  <h2 class="section-title"><span class="hash">#</span> 音频处理</h2>
+  <p class="section-desc">支持语音识别（ASR）、音频翻译等功能。支持 Whisper、Gemini 等音频模型。</p>
 
-  <div class="table-wrap">
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/audio/transcriptions</code>
+      <span class="badge badge-popular">热门</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">将音频转换为文本（语音识别）。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>file</code></td><td>file</td><td>是</td><td>音频文件（支持 mp3、mp4、mpeg、mpga、m4a、wav、webm）</td></tr>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>模型 ID，如 <code>whisper-1</code></td></tr>
+          <tr><td><code>language</code></td><td>string</td><td>否</td><td>音频语言（ISO-639-1 格式）</td></tr>
+          <tr><td><code>prompt</code></td><td>string</td><td>否</td><td>提示词，用于引导模型的风格</td></tr>
+          <tr><td><code>response_format</code></td><td>string</td><td>否</td><td>返回格式：<code>json</code>、<code>text</code>、<code>srt</code>、<code>verbose_json</code>、<code>vtt</code></td></tr>
+          <tr><td><code>temperature</code></td><td>number</td><td>否</td><td>采样温度，0-1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>with open("audio.mp3", "rb") as audio_file:
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+        language="zh",
+        response_format="text"
+    )
+
+print(transcript.text)</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/audio/transcriptions \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -F file="@audio.mp3" \
+  -F model="whisper-1" \
+  -F language="zh" \
+  -F response_format="text"</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/audio/translations</code>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">将音频翻译为英文。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 音频翻译示例</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>with open("chinese_audio.mp3", "rb") as audio_file:
+    translation = client.audio.translations.create(
+        model="whisper-1",
+        file=audio_file,
+        response_format="text"
+    )
+
+print(translation.text)  # 英文翻译结果</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 支持的音频格式</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>格式</th><th>扩展名</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>MP3</td><td><code>.mp3</code></td><td>最常见的音频格式</td></tr>
+          <tr><td>MP4</td><td><code>.mp4</code></td><td>视频文件中的音频</td></tr>
+          <tr><td>MPEG</td><td><code>.mpeg</code></td><td>MPEG 音频</td></tr>
+          <tr><td>MPGA</td><td><code>.mpga</code></td><td>MPEG 音频</td></tr>
+          <tr><td>M4A</td><td><code>.m4a</code></td><td>Apple 音频格式</td></tr>
+          <tr><td>WAV</td><td><code>.wav</code></td><td>无损音频格式</td></tr>
+          <tr><td>WebM</td><td><code>.webm</code></td><td>Web 音频格式</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SPEECH ===== -->
+<section class="doc-section" id="speech">
+  <h2 class="section-title"><span class="hash">#</span> 语音合成</h2>
+  <p class="section-desc">将文本转换为自然流畅的语音。支持 OpenAI TTS、Google Gemini TTS 等多种语音合成模型。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/audio/speech</code>
+      <span class="badge badge-new">新功能</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">将文本转换为语音音频。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>模型 ID，如 <code>tts-1</code> 或 <code>tts-1-hd</code></td></tr>
+          <tr><td><code>input</code></td><td>string</td><td>是</td><td>要转换的文本（最大 4096 字符）</td></tr>
+          <tr><td><code>voice</code></td><td>string</td><td>是</td><td>语音类型：<code>alloy</code>、<code>echo</code>、<code>fable</code>、<code>onyx</code>、<code>nova</code>、<code>shimmer</code></td></tr>
+          <tr><td><code>response_format</code></td><td>string</td><td>否</td><td>音频格式：<code>mp3</code>、<code>opus</code>、<code>aac</code>、<code>flac</code>、<code>wav</code>、<code>pcm</code></td></tr>
+          <tr><td><code>speed</code></td><td>number</td><td>否</td><td>语速，0.25-4.0，默认 1.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 语音类型</h3>
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="model-card-header">
+          <span class="model-name">alloy</span>
+        </div>
+        <div class="model-desc">平衡、中性的语音</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <span class="model-name">echo</span>
+        </div>
+        <div class="model-desc">清晰、专业的语音</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <span class="model-name">fable</span>
+        </div>
+        <div class="model-desc">富有表现力的语音</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <span class="model-name">onyx</span>
+        </div>
+        <div class="model-desc">深沉、有力的语音</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <span class="model-name">nova</span>
+        </div>
+        <div class="model-desc">年轻、活力的语音</div>
+      </div>
+      <div class="model-card">
+        <div class="model-card-header">
+          <span class="model-name">shimmer</span>
+        </div>
+        <div class="model-desc">柔和、温暖的语音</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.audio.speech.create(
+    model="tts-1-hd",
+    input="因果API 是一个统一的 AI 模型接口平台，支持多种主流模型。",
+    voice="nova",
+    response_format="mp3",
+    speed=1.0
+)
+
+# 保存音频文件
+response.stream_to_file("output.mp3")</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/audio/speech \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tts-1-hd",
+    "input": "因果API 是一个统一的 AI 模型接口平台",
+    "voice": "nova"
+  }' \
+  --output speech.mp3</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VIDEO ===== -->
+<section class="doc-section" id="video">
+  <h2 class="section-title"><span class="hash">#</span> 视频生成</h2>
+  <p class="section-desc">支持文本生成视频、图像生成视频等功能。支持 Sora、Runway、Pika 等主流视频生成模型。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/video/generations</code>
+      <span class="badge badge-beta">Beta</span>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">根据文本描述或图像生成视频。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>视频模型 ID</td></tr>
+          <tr><td><code>prompt</code></td><td>string</td><td>是</td><td>视频描述文本</td></tr>
+          <tr><td><code>image</code></td><td>string</td><td>否</td><td>参考图像 URL（图生视频）</td></tr>
+          <tr><td><code>duration</code></td><td>integer</td><td>否</td><td>视频时长（秒），默认 5</td></tr>
+          <tr><td><code>resolution</code></td><td>string</td><td>否</td><td>分辨率：<code>480p</code>、<code>720p</code>、<code>1080p</code></td></tr>
+          <tr><td><code>aspect_ratio</code></td><td>string</td><td>否</td><td>宽高比：<code>16:9</code>、<code>9:16</code>、<code>1:1</code></td></tr>
+          <tr><td><code>fps</code></td><td>integer</td><td>否</td><td>帧率，默认 24</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.video.generate(
+    model="sora",
+    prompt="一只金毛犬在海滩上奔跑，夕阳西下，温馨的画面",
+    duration=5,
+    resolution="720p",
+    aspect_ratio="16:9"
+)
+
+video_url = response.data[0].url
+print(f"视频 URL: {video_url}")</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/video/generations \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "sora",
+    "prompt": "一只金毛犬在海滩上奔跑，夕阳西下",
+    "duration": 5,
+    "resolution": "720p"
+  }'</pre>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>💡 提示</strong>
+    视频生成任务通常需要较长时间处理。建议使用异步方式调用，或通过 Webhook 接收完成通知。
+  </div>
+</section>
+
+<!-- ===== MODERATIONS ===== -->
+<section class="doc-section" id="moderations">
+  <h2 class="section-title"><span class="hash">#</span> 内容审查</h2>
+  <p class="section-desc">对文本内容进行安全审核，检测是否包含暴力、仇恨、自残、色情等违规内容。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/moderations</code>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">分析文本内容是否违反使用政策。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>是</td><td>审查模型 ID，如 <code>text-moderation-latest</code></td></tr>
+          <tr><td><code>input</code></td><td>string/array</td><td>是</td><td>要审查的文本</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 检测类别</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>类别</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>hate</code></td><td>仇恨言论</td></tr>
+          <tr><td><code>hate/threatening</code></td><td>仇恨威胁</td></tr>
+          <tr><td><code>harassment</code></td><td>骚扰</td></tr>
+          <tr><td><code>harassment/threatening</code></td><td>骚扰威胁</td></tr>
+          <tr><td><code>self-harm</code></td><td>自残</td></tr>
+          <tr><td><code>self-harm/intent</code></td><td>自残意图</td></tr>
+          <tr><td><code>self-harm/instructions</code></td><td>自残指导</td></tr>
+          <tr><td><code>sexual</code></td><td>色情内容</td></tr>
+          <tr><td><code>sexual/minors</code></td><td>涉及未成年人的色情内容</td></tr>
+          <tr><td><code>violence</code></td><td>暴力内容</td></tr>
+          <tr><td><code>violence/graphic</code></td><td>血腥暴力</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 示例请求</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.moderations.create(
+    model="text-moderation-latest",
+    input="这段文本需要进行内容审查"
+)
+
+result = response.results[0]
+
+# 检查是否被标记
+if result.flagged:
+    print("内容被标记为违规")
+    # 查看具体类别
+    for category, details in result.categories.items():
+        if details:
+            print(f"- {category}: {details}")
+else:
+    print("内容通过审查")</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/moderations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -d '{
+    "model": "text-moderation-latest",
+    "input": "这段文本需要进行内容审查"
+  }'</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 响应格式</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">json</span>
+      <pre>{
+  "id": "modr-xxxxxxxxxxxx",
+  "model": "text-moderation-latest",
+  "results": [
+    {
+      "flagged": false,
+      "categories": {
+        "hate": false,
+        "harassment": false,
+        "self-harm": false,
+        "sexual": false,
+        "violence": false
+      },
+      "category_scores": {
+        "hate": 0.0001,
+        "harassment": 0.001,
+        "self-harm": 0.00001,
+        "sexual": 0.0002,
+        "violence": 0.0003
+      }
+    }
+  ]
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MODELS LIST ===== -->
+<section class="doc-section" id="models-chat">
+  <h2 class="section-title"><span class="hash">#</span> 聊天模型</h2>
+  <p class="section-desc">支持多种主流聊天模型，包括 OpenAI GPT、Anthropic Claude、Google Gemini、DeepSeek 等。</p>
+
+  <div class="model-grid">
+    <!-- OpenAI Models -->
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">gpt-4o</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">最新的多模态旗舰模型，支持文本、图像、音频输入</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>多模态</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">gpt-4o-mini</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">高性价比的小型模型，适合快速响应场景</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>快速</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">gpt-4-turbo</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">GPT-4 Turbo 模型，支持 128K 上下文</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>多模态</span>
+      </div>
+    </div>
+
+    <!-- Anthropic Models -->
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">claude-opus-4-7</span>
+        <span class="model-provider">Anthropic</span>
+      </div>
+      <div class="model-desc">Claude 旗舰模型，最强推理能力</div>
+      <div class="model-meta">
+        <span>上下文：200K</span>
+        <span>最强</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">claude-sonnet-4-6</span>
+        <span class="model-provider">Anthropic</span>
+      </div>
+      <div class="model-desc">性能与速度的平衡，适合大多数场景</div>
+      <div class="model-meta">
+        <span>上下文：200K</span>
+        <span>平衡</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">claude-haiku-4-5</span>
+        <span class="model-provider">Anthropic</span>
+      </div>
+      <div class="model-desc">极速响应，适合高并发场景</div>
+      <div class="model-meta">
+        <span>上下文：200K</span>
+        <span>快速</span>
+      </div>
+    </div>
+
+    <!-- Google Models -->
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">gemini-2.5-pro</span>
+        <span class="model-provider">Google</span>
+      </div>
+      <div class="model-desc">超长上下文推理模型，支持 100 万 token</div>
+      <div class="model-meta">
+        <span>上下文：1M</span>
+        <span>推理</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">gemini-2.5-flash</span>
+        <span class="model-provider">Google</span>
+      </div>
+      <div class="model-desc">高速响应版，适合实时对话</div>
+      <div class="model-meta">
+        <span>上下文：1M</span>
+        <span>快速</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">gemini-2.0-flash</span>
+        <span class="model-provider">Google</span>
+      </div>
+      <div class="model-desc">稳定快速版，适合生产环境</div>
+      <div class="model-meta">
+        <span>上下文：1M</span>
+        <span>稳定</span>
+      </div>
+    </div>
+
+    <!-- DeepSeek Models -->
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">deepseek-v3</span>
+        <span class="model-provider">DeepSeek</span>
+      </div>
+      <div class="model-desc">国产开源旗舰模型，性价比高</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>开源</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">deepseek-r1</span>
+        <span class="model-provider">DeepSeek</span>
+      </div>
+      <div class="model-desc">深度思考推理模型，擅长复杂问题</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>推理</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">deepseek-v3.1</span>
+        <span class="model-provider">DeepSeek</span>
+      </div>
+      <div class="model-desc">最新旗舰增强版，性能提升</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>增强</span>
+      </div>
+    </div>
+
+    <!-- Mistral Models -->
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">mistral-large-latest</span>
+        <span class="model-provider">Mistral</span>
+      </div>
+      <div class="model-desc">Mistral 旗舰模型，欧洲顶级开源模型</div>
+      <div class="model-meta">
+        <span>上下文：128K</span>
+        <span>开源</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doc-section" id="models-embedding">
+  <h2 class="section-title"><span class="hash">#</span> 嵌入模型</h2>
+  <p class="section-desc">将文本转换为向量表示，用于语义搜索、文本相似度计算等场景。</p>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">text-embedding-3-small</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">小型嵌入模型，高性价比</div>
+      <div class="model-meta">
+        <span>维度：1536</span>
+        <span>性价比</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">text-embedding-3-large</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">大型嵌入模型，更高精度</div>
+      <div class="model-meta">
+        <span>维度：3072</span>
+        <span>高精度</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">text-embedding-ada-002</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">经典嵌入模型，广泛兼容</div>
+      <div class="model-meta">
+        <span>维度：1536</span>
+        <span>经典</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">embedding-001</span>
+        <span class="model-provider">Google</span>
+      </div>
+      <div class="model-desc">Google 嵌入模型，支持多语言</div>
+      <div class="model-meta">
+        <span>维度：768</span>
+        <span>多语言</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doc-section" id="models-image">
+  <h2 class="section-title"><span class="hash">#</span> 图像模型</h2>
+  <p class="section-desc">支持文本生成图像、图像编辑等功能。</p>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">dall-e-3</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">最新的图像生成模型，支持高清和多种风格</div>
+      <div class="model-meta">
+        <span>尺寸：1024x1024</span>
+        <span>高清</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">dall-e-2</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">经典图像生成模型，支持编辑和变体</div>
+      <div class="model-meta">
+        <span>尺寸：1024x1024</span>
+        <span>经典</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">stable-diffusion-xl</span>
+        <span class="model-provider">Stability AI</span>
+      </div>
+      <div class="model-desc">开源图像生成模型，高度可定制</div>
+      <div class="model-meta">
+        <span>尺寸：1024x1024</span>
+        <span>开源</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">imagen-3</span>
+        <span class="model-provider">Google</span>
+      </div>
+      <div class="model-desc">Google 最新图像生成模型，高质量输出</div>
+      <div class="model-meta">
+        <span>尺寸：1024x1024</span>
+        <span>高质量</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doc-section" id="models-audio">
+  <h2 class="section-title"><span class="hash">#</span> 音频模型</h2>
+  <p class="section-desc">支持语音识别、语音合成等音频处理功能。</p>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">whisper-1</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">多语言语音识别模型，支持 50+ 种语言</div>
+      <div class="model-meta">
+        <span>语言：50+</span>
+        <span>ASR</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">tts-1</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">文字转语音模型，多种语音可选</div>
+      <div class="model-meta">
+        <span>语音：6种</span>
+        <span>TTS</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">tts-1-hd</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">高清文字转语音，更高音质</div>
+      <div class="model-meta">
+        <span>语音：6种</span>
+        <span>高清</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doc-section" id="models-video">
+  <h2 class="section-title"><span class="hash">#</span> 视频模型</h2>
+  <p class="section-desc">支持文本生成视频、图像生成视频等功能。</p>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">sora</span>
+        <span class="model-provider">OpenAI</span>
+      </div>
+      <div class="model-desc">文本生成视频模型，支持长达 1 分钟的视频</div>
+      <div class="model-meta">
+        <span>时长：60s</span>
+        <span>Beta</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">runway-gen-3</span>
+        <span class="model-provider">Runway</span>
+      </div>
+      <div class="model-desc">专业视频生成模型，电影级质量</div>
+      <div class="model-meta">
+        <span>时长：10s</span>
+        <span>专业</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">pika-2.0</span>
+        <span class="model-provider">Pika</span>
+      </div>
+      <div class="model-desc">快速视频生成，支持图生视频</div>
+      <div class="model-meta">
+        <span>时长：5s</span>
+        <span>快速</span>
+      </div>
+    </div>
+
+    <div class="model-card">
+      <div class="model-card-header">
+        <span class="model-name">veo-2</span>
+        <span class="model-provider">Google</span>
+      </div>
+      <div class="model-desc">Google 视频生成模型，高质量输出</div>
+      <div class="model-meta">
+        <span>时长：8s</span>
+        <span>高质量</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ERRORS ===== -->
+<section class="doc-section" id="errors">
+  <h2 class="section-title"><span class="hash">#</span> 错误码</h2>
+  <p class="section-desc">API 返回标准 HTTP 状态码，错误响应体包含详细的错误信息。</p>
+
+  <div class="table-wrapper">
     <table>
-      <thead><tr><th>状态码</th><th>错误类型</th><th>说明</th></tr></thead>
+      <thead><tr><th>状态码</th><th>说明</th><th>常见原因</th></tr></thead>
       <tbody>
-        <tr><td><span class="badge badge-red">400</span></td><td><code>invalid_request_error</code></td><td>请求参数有误，请检查格式</td></tr>
-        <tr><td><span class="badge badge-red">401</span></td><td><code>authentication_error</code></td><td>API Key 无效或缺失</td></tr>
-        <tr><td><span class="badge badge-red">402</span></td><td><code>insufficient_quota</code></td><td>余额不足或令牌额度已耗尽</td></tr>
-        <tr><td><span class="badge badge-red">403</span></td><td><code>permission_error</code></td><td>无权访问该模型或资源</td></tr>
-        <tr><td><span class="badge badge-red">404</span></td><td><code>not_found_error</code></td><td>请求的资源不存在</td></tr>
-        <tr><td><span class="badge badge-red">429</span></td><td><code>rate_limit_error</code></td><td>请求频率超限，请稍后重试</td></tr>
-        <tr><td><span class="badge badge-red">500</span></td><td><code>server_error</code></td><td>服务器内部错误，可稍后重试或联系支持</td></tr>
-        <tr><td><span class="badge badge-red">503</span></td><td><code>service_unavailable</code></td><td>服务暂时不可用</td></tr>
+        <tr><td><code>200</code></td><td>成功</td><td>请求成功处理</td></tr>
+        <tr><td><code>400</code></td><td>请求错误</td><td>参数缺失或格式错误</td></tr>
+        <tr><td><code>401</code></td><td>未授权</td><td>API Key 无效或缺失</td></tr>
+        <tr><td><code>403</code></td><td>禁止访问</td><td>没有权限访问该资源</td></tr>
+        <tr><td><code>404</code></td><td>未找到</td><td>请求的资源不存在</td></tr>
+        <tr><td><code>429</code></td><td>请求过多</td><td>触发速率限制</td></tr>
+        <tr><td><code>500</code></td><td>服务器错误</td><td>服务器内部错误</td></tr>
+        <tr><td><code>502</code></td><td>网关错误</td><td>上游服务不可用</td></tr>
+        <tr><td><code>503</code></td><td>服务不可用</td><td>服务器过载或维护</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 错误响应示例</h3>
+    <h3 class="subsection-title"><span class="hash">#</span> 错误响应格式</h3>
     <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">json</span>
       <pre>{
   "error": {
-    "message": "API Key 无效",
-    "type": "authentication_error",
+    "message": "Invalid API key",
+    "type": "invalid_request_error",
+    "param": null,
     "code": "invalid_api_key"
   }
 }</pre>
@@ -1403,9 +1889,9 @@ print(response.data[0].url)</pre>
 <!-- ===== RATE LIMIT ===== -->
 <section class="doc-section" id="rate-limit">
   <h2 class="section-title"><span class="hash">#</span> 速率限制</h2>
-  <p class="section-desc">为保证服务稳定，因果API 对 API 调用实施速率限制。</p>
+  <p class="section-desc">为保证服务稳定性，API 对请求频率进行限制。</p>
 
-  <div class="table-wrap">
+  <div class="table-wrapper">
     <table>
       <thead><tr><th>限制维度</th><th>默认值</th><th>说明</th></tr></thead>
       <tbody>
@@ -1417,7 +1903,8 @@ print(response.data[0].url)</pre>
   </div>
 
   <div class="alert alert-tip">
-    <strong>💡 提示：</strong>如需更高的速率限制，请联系管理员调整。
+    <strong>💡 提示</strong>
+    如需更高的速率限制，请联系管理员调整。
   </div>
 
   <div class="subsection">
@@ -1465,38 +1952,8 @@ def call_with_retry(client, max_retries=5, **kwargs):
     <p style="color:var(--text-secondary)">立即登录控制台 → 令牌管理，删除泄露的令牌并创建新的。建议定期轮换。</p>
   </div>
   <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 支持 Claude / Gemini 的原生格式吗？</h3>
-    <p style="color:var(--text-secondary)">当前统一使用 OpenAI 兼容格式。使用 OpenAI SDK 将 <code>base_url</code> 指向因果API 即可调用所有支持模型。</p>
-  </div>
-  <div class="subsection">
     <h3 class="subsection-title"><span class="hash">#</span> 数据传输是否加密？</h3>
     <p style="color:var(--text-secondary)">所有 API 通信均通过 HTTPS 加密传输。</p>
-  </div>
-</section>
-
-<!-- ===== CHANGELOG ===== -->
-<section class="doc-section" id="changelog">
-  <h2 class="section-title"><span class="hash">#</span> 更新日志</h2>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> v1.0 初始版本</h3>
-    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
-      <li>支持 OpenAI Chat Completions 兼容接口</li>
-      <li>支持 GPT-4o、Claude、Gemini、DeepSeek 等主流模型</li>
-      <li>API Key 管理与额度控制系统</li>
-      <li>流式输出（SSE）支持</li>
-      <li>图像生成接口</li>
-    </ul>
-  </div>
-
-  <div class="subsection">
-    <h3 class="subsection-title"><span class="hash">#</span> 即将推出</h3>
-    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
-      <li>更多模型接入（Midjourney、Suno 等）</li>
-      <li>Function Calling / Tools 增强</li>
-      <li>WebSocket 实时对话</li>
-      <li>用量统计仪表板</li>
-    </ul>
   </div>
 </section>
 
@@ -1508,101 +1965,43 @@ function toggleSection(el) {
   el.parentElement.classList.toggle('collapsed');
 }
 
-// Mobile sidebar
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.querySelector('.sidebar-backdrop').classList.toggle('show');
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.querySelector('.sidebar-backdrop').classList.remove('show');
-}
-
-// Active nav on scroll
-const sections = document.querySelectorAll('.doc-section');
-const navLinks = document.querySelectorAll('.nav-item a');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      navLinks.forEach(link => {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
-      });
-    }
-  });
-}, { rootMargin: '-15% 0px -75% 0px' });
-sections.forEach(s => observer.observe(s));
-
 // Copy code
 function copyCode(btn) {
-  const pre = btn.parentElement.querySelector('pre');
-  navigator.clipboard.writeText(pre.textContent).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = '已复制!';
-    setTimeout(() => { btn.textContent = orig; }, 1500);
+  const code = btn.parentElement.querySelector('pre').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '已复制';
+    setTimeout(() => btn.textContent = '复制', 2000);
   });
 }
 
 // Search
-function searchDocs(query) {
-  const q = query.toLowerCase().trim();
-  // Reset highlights
-  document.querySelectorAll('.search-highlight').forEach(el => {
-    el.outerHTML = el.textContent;
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll('.nav-item a').forEach(link => {
+    const searchText = link.getAttribute('data-search') || '';
+    const title = link.textContent.toLowerCase();
+    const match = searchText.includes(query) || title.includes(query);
+    link.parentElement.style.display = match ? 'block' : 'none';
   });
+});
 
-  if (!q) {
-    // Show all sections
-    document.querySelectorAll('.nav-item').forEach(el => el.style.display = '');
-    document.querySelectorAll('.nav-section').forEach(el => el.style.display = '');
-    return;
-  }
-
-  // Search in nav items
-  let hasResults = false;
-  document.querySelectorAll('.nav-item').forEach(item => {
-    const a = item.querySelector('a');
-    const searchData = (a.dataset.search || '') + ' ' + a.textContent;
-    if (searchData.toLowerCase().includes(q)) {
-      item.style.display = '';
-      item.closest('.nav-section').style.display = '';
-      hasResults = true;
-    } else {
-      item.style.display = 'none';
+// Active section highlighting
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      document.querySelectorAll('.nav-item a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + entry.target.id) {
+          link.classList.add('active');
+        }
+      });
     }
   });
+}, { threshold: 0.5 });
 
-  // Hide empty sections
-  document.querySelectorAll('.nav-section').forEach(section => {
-    const visibleItems = section.querySelectorAll('.nav-item[style*="display: none"]');
-    if (visibleItems.length === section.querySelectorAll('.nav-item').length) {
-      section.style.display = 'none';
-    } else {
-      section.style.display = '';
-      section.classList.remove('collapsed');
-    }
-  });
-
-  // Highlight in content
-  if (q) {
-    const main = document.querySelector('.main');
-    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, null, false);
-    const textNodes = [];
-    while (walker.nextNode()) textNodes.push(walker.currentNode);
-
-    textNodes.forEach(node => {
-      const text = node.textContent.toLowerCase();
-      const idx = text.indexOf(q);
-      if (idx !== -1 && node.parentElement && !['SCRIPT','STYLE','PRE','CODE'].includes(node.parentElement.tagName)) {
-        const span = document.createElement('span');
-        span.className = 'search-highlight';
-        const range = document.createRange();
-        range.setStart(node, idx);
-        range.setEnd(node, idx + q.length);
-        range.surroundContents(span);
-      }
-    });
-  }
-}
+document.querySelectorAll('.doc-section').forEach(section => {
+  observer.observe(section);
+});
 </script>
 
 </body>
