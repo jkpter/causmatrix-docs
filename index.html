@@ -801,14 +801,14 @@ td code, th code {
     </li>
     <li>
       <strong>发起调用</strong><br>
-      将 <code>base_url</code> 设为 <code>https://api.causmatrix.xyz/v1</code>，搭配你的 API Key 即可调用。
+      将 <code>base_url</code> 设为 <code>https://causmatrix.xyz/v1</code>，搭配你的 API Key 即可调用。
     </li>
   </ol>
 
   <div class="card">
     <div class="card-title">📋 连接信息</div>
     <table>
-      <tr><td style="width:140px;font-weight:500;">API 地址</td><td><code>https://api.causmatrix.xyz</code></td></tr>
+      <tr><td style="width:140px;font-weight:500;">API 地址</td><td><code>https://causmatrix.xyz</code></td></tr>
       <tr><td style="font-weight:500;">接口格式</td><td>OpenAI 兼容（Chat Completions / Images）</td></tr>
       <tr><td style="font-weight:500;">鉴权方式</td><td><code>Authorization: Bearer &lt;API-Key&gt;</code></td></tr>
     </table>
@@ -819,7 +819,7 @@ td code, th code {
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">bash</span>
-      <pre>curl https://api.causmatrix.xyz/v1/chat/completions \
+      <pre>curl https://causmatrix.xyz/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{
@@ -841,7 +841,7 @@ td code, th code {
 
 client = OpenAI(
     api_key="YOUR_API_KEY",
-    base_url="https://api.causmatrix.xyz/v1"
+    base_url="https://causmatrix.xyz/v1"
 )
 
 response = client.chat.completions.create(
@@ -865,7 +865,7 @@ print(response.choices[0].message.content)</pre>
 
 const client = new OpenAI({
   apiKey: "YOUR_API_KEY",
-  baseURL: "https://api.causmatrix.xyz/v1"
+  baseURL: "https://causmatrix.xyz/v1"
 });
 
 const response = await client.chat.completions.create({
@@ -877,6 +877,17 @@ const response = await client.chat.completions.create({
 });
 
 console.log(response.choices[0].message.content);</pre>
+    </div>
+  </div>
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> Gemini 配置</h3>
+    <p style="color:var(--text-secondary)">使用 Gemini 模型时，推荐设置以下环境变量：</p>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>export GOOGLE_GEMINI_BASE_URL="https://causmatrix.xyz"
+export GEMINI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export GEMINI_MODEL="gemini-2.0-flash"  # 如有 Gemini 3 权限可填：gemini-3-pro-preview</pre>
     </div>
   </div>
 </section>
@@ -944,8 +955,8 @@ console.log(response.choices[0].message.content);</pre>
           <tr><td><code>claude-opus-4-7</code></td><td>Anthropic</td><td>200K</td><td>Claude 旗舰模型</td></tr>
           <tr><td><code>claude-sonnet-4-6</code></td><td>Anthropic</td><td>200K</td><td>性能与速度的平衡</td></tr>
           <tr><td><code>claude-haiku-4-5</code></td><td>Anthropic</td><td>200K</td><td>极速响应</td></tr>
-          <tr><td><code>gemini-2.5-pro</code></td><td>Google</td><td>1M</td><td>超长上下文推理</td></tr>
-          <tr><td><code>gemini-2.5-flash</code></td><td>Google</td><td>1M</td><td>高速响应版</td></tr>
+          <tr><td><code>gemini-2.0-flash</code></td><td>Google</td><td>1M</td><td>高速响应版</td></tr>
+          <tr><td><code>gemini-3-pro-preview</code></td><td>Google</td><td>1M</td><td>最新旗舰推理模型</td></tr>
           <tr><td><code>deepseek-v3</code></td><td>DeepSeek</td><td>128K</td><td>国产开源旗舰</td></tr>
           <tr><td><code>deepseek-r1</code></td><td>DeepSeek</td><td>128K</td><td>深度思考推理</td></tr>
         </tbody>
