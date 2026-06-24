@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>因果API API 文档</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #ffffff;
+  --bg-sidebar: #f8f9fb;
+  --bg-card: #fafbfc;
+  --bg-code: #f5f6f8;
+  --primary: #2563eb;
+  --primary-light: #eff4ff;
+  --primary-hover: #1d4ed8;
+  --primary-glow: rgba(37, 99, 235, 0.08);
+  --accent: #059669;
+  --text: #1e293b;
+  --text-secondary: #4b5563;
+  --text-dim: #8896a8;
+  --text-faint: #b0b8c4;
+  --border: #e5e7eb;
+  --border-light: #f0f1f3;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --sidebar-w: 280px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-hover); }
+
+/* ===== LAYOUT ===== */
+.layout { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+.sidebar-brand {
+  padding: 24px 24px 20px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #2563eb, #06b6d4);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.brand-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.brand-text span { color: var(--primary); }
+
+/* Search */
+.sidebar-search {
+  padding: 0 20px 16px;
+  flex-shrink: 0;
+}
+
+.sidebar-search input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sidebar-search input:focus { border-color: var(--primary); }
+.sidebar-search input::placeholder { color: var(--text-faint); }
+
+.sidebar-search .search-icon {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-faint);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.nav-section { margin-bottom: 2px; }
+
+.nav-section-title {
+  padding: 10px 24px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.nav-section-title:hover { color: var(--text-secondary); }
+
+.nav-section-title svg {
+  width: 14px; height: 14px;
+  transition: transform 0.2s;
+}
+
+.nav-section.collapsed .nav-items { display: none; }
+.nav-section.collapsed svg { transform: rotate(-90deg); }
+
+.nav-items { list-style: none; }
+
+.nav-item a {
+  display: block;
+  padding: 7px 24px 7px 36px;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  line-height: 1.5;
+}
+
+.nav-item a:hover { color: var(--text); background: rgba(0,0,0,0.03); }
+.nav-item a.active {
+  color: var(--primary);
+  background: var(--primary-light);
+  border-left-color: var(--primary);
+}
+
+.sidebar-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  gap: 16px;
+}
+
+.sidebar-footer a {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.sidebar-footer a:hover { color: var(--text); }
+
+/* ===== MOBILE ===== */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px; left: 12px;
+  z-index: 200;
+  width: 40px; height: 40px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 99;
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-width: 0;
+  padding: 56px 64px 80px;
+  max-width: 920px;
+}
+
+/* ===== HERO ===== */
+.hero {
+  margin-bottom: 56px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.8px;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* ===== SECTION ===== */
+.doc-section {
+  margin-bottom: 64px;
+  scroll-margin-top: 32px;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.section-title .hash {
+  color: var(--text-faint);
+  font-weight: 400;
+  margin-right: 6px;
+}
+
+.section-desc {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+/* ===== SUBSECTION ===== */
+.subsection {
+  margin: 40px 0 32px;
+  scroll-margin-top: 32px;
+}
+
+.subsection-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  padding-bottom: 0;
+}
+
+.subsection-title .hash {
+  color: var(--text-faint);
+  font-weight: 400;
+  margin-right: 6px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+/* ===== TABLE ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  background: var(--bg-card);
+  padding: 11px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-dim);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-light);
+  color: var(--text-secondary);
+}
+
+tr:first-child td { border-top: none; }
+
+td code, th code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  background: #eef2ff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: #4f46e5;
+}
+
+/* ===== CODE BLOCK ===== */
+.code-block {
+  background: #1e293b;
+  border-radius: var(--radius);
+  margin: 16px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.code-block .lang-tag {
+  position: absolute;
+  top: 10px; right: 14px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.code-block .copy-btn {
+  position: absolute;
+  top: 8px; right: 64px;
+  font-size: 11px;
+  font-family: 'Inter', 'Noto Sans SC', sans-serif;
+  color: #94a3b8;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.code-block .copy-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.16);
+}
+
+.code-block pre {
+  padding: 20px;
+  overflow-x: auto;
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  color: #e2e8f0;
+}
+
+.code-block pre .kw  { color: #c084fc; }
+.code-block pre .str { color: #86efac; }
+.code-block pre .cm  { color: #64748b; font-style: italic; }
+.code-block pre .fn  { color: #93c5fd; }
+.code-block pre .num { color: #fda4af; }
+.code-block pre .prop { color: #67e8f9; }
+
+/* ===== INLINE CODE ===== */
+:not(pre) > code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: #eef2ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #4f46e5;
+}
+
+/* ===== ALERTS ===== */
+.alert {
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  border-left: 4px solid;
+}
+
+.alert-info {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.alert-warn {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.alert-danger {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.alert-tip {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  color: #14532d;
+}
+
+.alert strong { color: inherit; }
+
+/* ===== STEPS ===== */
+.step-list { list-style: none; counter-reset: step; }
+
+.step-list li {
+  counter-increment: step;
+  padding: 14px 0 14px 44px;
+  position: relative;
+  border-left: 1px solid var(--border);
+  margin-left: 9px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.step-list li::before {
+  content: counter(step);
+  position: absolute;
+  left: -15px; top: 14px;
+  width: 28px; height: 28px;
+  background: #fff;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.step-list li:last-child { border-left-color: transparent; }
+
+/* ===== FEATURE GRID ===== */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.feature-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.feature-card .icon {
+  width: 40px; height: 40px;
+  background: var(--primary-light);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.feature-card h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.feature-card p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ===== BADGES ===== */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.badge-green { background: #dcfce7; color: #15803d; }
+.badge-blue  { background: #dbeafe; color: #1d4ed8; }
+.badge-red   { background: #fee2e2; color: #dc2626; }
+
+/* ===== HTTP METHOD ===== */
+.method {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-right: 8px;
+}
+
+.method-post { background: #dcfce7; color: #15803d; }
+.method-get  { background: #dbeafe; color: #1d4ed8; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-toggle { display: flex; }
+  .sidebar-backdrop.show { display: block; }
+  .main {
+    margin-left: 0;
+    padding: 24px 20px 56px;
+  }
+  .hero h1 { font-size: 26px; }
+  .section-title { font-size: 22px; }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .main { padding: 16px 14px 40px; }
+}
+
+/* ===== ANCHOR HIGHLIGHT ===== */
+:target {
+  animation: highlight 1.8s ease-out;
+}
+
+@keyframes highlight {
+  0%   { background: #eff4ff; }
+  100% { background: transparent; }
+}
+
+/* ===== RIGHT SIDEBAR TOC ===== */
+.content-wrapper {
+  display: flex;
+  gap: 0;
+}
+
+/* ===== TOC ===== */
+.toc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+
+.toc-card .toc-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.toc-card ul { list-style: none; }
+.toc-card li { margin: 3px 0; }
+
+.toc-card a {
+  color: var(--text-dim);
+  font-size: 13px;
+  transition: color 0.15s;
+}
+
+.toc-card a:hover { color: var(--primary); }
+
+/* ===== SEARCH HIGHLIGHT ===== */
+.search-highlight { background: #fef08a; border-radius: 2px; }
+
+/* ===== DIVIDER ===== */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile -->
+<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="菜单">☰</button>
+<div class="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <a href="#">
+      <div class="brand-icon">因</div>
+      <div class="brand-text">因果<span>AI</span></div>
+    </a>
+  </div>
+
+  <div class="sidebar-search" style="position:relative;">
+    <span class="search-icon" style="position:absolute;left:30px;top:50%;transform:translateY(-50%);color:#b0b8c4;font-size:14px;pointer-events:none;">🔍</span>
+    <input type="text" placeholder="搜索文档..." oninput="searchDocs(this.value)">
+  </div>
+
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        开始使用
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#intro" data-search="项目介绍 因果API 是什么">项目介绍</a></li>
+        <li class="nav-item"><a href="#quickstart" data-search="快速开始 入门 三步 注册">快速开始</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        使用指南
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#get-key" data-search="获取 API Key 令牌 token 创建">获取 API Key</a></li>
+        <li class="nav-item"><a href="#models" data-search="模型列表 model gpt claude gemini">模型列表</a></li>
+        <li class="nav-item"><a href="#pricing" data-search="额度 计费 价格 pricing 费用">额度与计费</a></li>
+        <li class="nav-item"><a href="#best-practices" data-search="最佳实践 安全 性能 优化">最佳实践</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        API 参考
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#auth" data-search="鉴权 认证 authorization bearer key">鉴权方式</a></li>
+        <li class="nav-item"><a href="#chat-completions" data-search="聊天补全 chat completions 对话 API">聊天补全</a></li>
+        <li class="nav-item"><a href="#image-gen" data-search="图像生成 image 画图 dalle">图像生成</a></li>
+        <li class="nav-item"><a href="#error-codes" data-search="错误码 error 400 401 429 500">错误码</a></li>
+        <li class="nav-item"><a href="#rate-limit" data-search="速率限制 rate limit 限流 429">速率限制</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title" onclick="toggleSection(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        其他
+      </div>
+      <ul class="nav-items">
+        <li class="nav-item"><a href="#faq" data-search="常见问题 FAQ 问题 帮助">常见问题</a></li>
+        <li class="nav-item"><a href="#changelog" data-search="更新日志 changelog 版本 发布">更新日志</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="https://causmatrix.xyz">← 返回首页</a>
+    <a href="https://github.com" target="_blank">GitHub</a>
+    <a href="mailto:support@causmatrix.xyz">联系支持</a>
+  </div>
+</aside>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="main">
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-badge">📖 API 文档</div>
+  <h1>因果API 开发文档</h1>
+  <p>因果API 是新一代 AI 模型中转服务平台，将多种大语言模型统一为 OpenAI 兼容格式。一个 API Key，调用全球主流 AI 模型。</p>
+</div>
+
+<!-- ===== INTRO ===== -->
+<section class="doc-section" id="intro">
+  <h2 class="section-title"><span class="hash">#</span> 项目介绍</h2>
+  <p class="section-desc">因果API 致力于提供稳定、快速、经济的 AI 模型 API 中转服务，让开发者只需接入一次，即可使用 OpenAI、Claude、Gemini、DeepSeek 等数十种主流大模型。</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon">🔌</div>
+      <h4>OpenAI 完全兼容</h4>
+      <p>与 OpenAI Chat Completions API 格式 100% 兼容，零改动迁移。</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🌐</div>
+      <h4>多模型汇聚</h4>
+      <p>一个 API Key 访问 OpenAI、Claude、Gemini、DeepSeek 等数十种模型。</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">⚡</div>
+      <h4>低延迟加速</h4>
+      <p>全球节点优化，毫秒级响应，稳定可靠的企业级中转服务。</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💰</div>
+      <h4>透明计费</h4>
+      <p>按量计费、无隐藏费用，实时查看每次调用的 Token 消耗与费用明细。</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔒</div>
+      <h4>安全可控</h4>
+      <p>支持 IP 白名单、API Key 细粒度权限控制，全方位保障调用安全。</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📊</div>
+      <h4>用量可视</h4>
+      <p>控制台提供实时用量统计、费用趋势图表，数据一目了然。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUICKSTART ===== -->
+<section class="doc-section" id="quickstart">
+  <h2 class="section-title"><span class="hash">#</span> 快速开始</h2>
+  <p class="section-desc">只需三步，即可通过因果API 调用全球 AI 大模型。</p>
+
+  <ol class="step-list">
+    <li>
+      <strong>注册账号</strong><br>
+      访问 <a href="https://causmatrix.xyz">causmatrix.xyz</a> 注册并登录你的因果API 账号。
+    </li>
+    <li>
+      <strong>获取 API Key</strong><br>
+      进入控制台 → 令牌管理，创建一个新的 API Key。<strong>请立即复制保存——Key 仅在创建时显示一次。</strong>
+    </li>
+    <li>
+      <strong>发起调用</strong><br>
+      将 <code>base_url</code> 设为 <code>https://api.causmatrix.xyz/v1</code>，搭配你的 API Key 即可调用。
+    </li>
+  </ol>
+
+  <div class="card">
+    <div class="card-title">📋 连接信息</div>
+    <table>
+      <tr><td style="width:140px;font-weight:500;">API 地址</td><td><code>https://api.causmatrix.xyz</code></td></tr>
+      <tr><td style="font-weight:500;">接口格式</td><td>OpenAI 兼容（Chat Completions / Images）</td></tr>
+      <tr><td style="font-weight:500;">鉴权方式</td><td><code>Authorization: Bearer &lt;API-Key&gt;</code></td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> cURL</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://api.causmatrix.xyz/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [
+      {"role": "system", "content": "你是一个有帮助的助手。"},
+      {"role": "user", "content": "你好，请介绍一下自己。"}
+    ]
+  }'</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> Python</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>from openai import OpenAI
+
+client = OpenAI(
+    api_key="YOUR_API_KEY",
+    base_url="https://api.causmatrix.xyz/v1"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "你是一个有帮助的助手。"},
+        {"role": "user", "content": "你好，请介绍一下自己。"}
+    ]
+)
+
+print(response.choices[0].message.content)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> JavaScript / Node.js</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">javascript</span>
+      <pre>import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_API_KEY",
+  baseURL: "https://api.causmatrix.xyz/v1"
+});
+
+const response = await client.chat.completions.create({
+  model: "gpt-4o",
+  messages: [
+    { role: "system", content: "你是一个有帮助的助手。" },
+    { role: "user", content: "你好，请介绍一下自己。" }
+  ]
+});
+
+console.log(response.choices[0].message.content);</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GET API KEY ===== -->
+<section class="doc-section" id="get-key">
+  <h2 class="section-title"><span class="hash">#</span> 获取 API Key</h2>
+  <p class="section-desc">API Key 是调用因果API 服务的唯一凭证，请妥善保管。</p>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 创建令牌</h3>
+    <ol class="step-list">
+      <li>登录因果API，进入 <strong>控制台 → 令牌管理</strong></li>
+      <li>点击 <strong>新建令牌</strong></li>
+      <li>填写令牌名称、过期时间、额度限制、模型权限等信息</li>
+      <li>点击创建，<strong>立即复制 Key 并安全保存</strong></li>
+    </ol>
+    <div class="alert alert-danger">
+      <strong>⚠️ 重要：</strong>API Key 仅在创建时完整显示一次，关闭弹窗后无法再次查看。如果遗失，只能删除并重新创建。
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 令牌配置项</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>配置项</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>令牌名称</td><td>用于标识用途，如「生产环境」「个人测试」</td></tr>
+          <tr><td>过期时间</td><td>留空或设为 -1 表示永不过期</td></tr>
+          <tr><td>剩余额度</td><td>限制该令牌可消耗的最大金额，超出后自动失效</td></tr>
+          <tr><td>无限额度</td><td>开启后不受该令牌额度限制（仅受账户总余额约束）</td></tr>
+          <tr><td>模型限制</td><td>限定该令牌可调用的模型，留空不限制</td></tr>
+          <tr><td>IP 白名单</td><td>限制可访问的来源 IP，多个用逗号分隔</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 在请求中使用</h3>
+    <div class="code-block">
+      <span class="lang-tag">http</span>
+      <pre>Authorization: Bearer sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MODELS ===== -->
+<section class="doc-section" id="models">
+  <h2 class="section-title"><span class="hash">#</span> 模型列表</h2>
+  <p class="section-desc">因果API 持续接入主流 AI 模型，以下为当前支持的模型列表。</p>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 对话模型</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>模型 ID</th><th>提供商</th><th>上下文</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>gpt-4o</code></td><td>OpenAI</td><td>128K</td><td>最新多模态旗舰模型</td></tr>
+          <tr><td><code>gpt-4o-mini</code></td><td>OpenAI</td><td>128K</td><td>轻量高效，高性价比</td></tr>
+          <tr><td><code>gpt-4-turbo</code></td><td>OpenAI</td><td>128K</td><td>GPT-4 Turbo</td></tr>
+          <tr><td><code>o3</code></td><td>OpenAI</td><td>200K</td><td>深度推理模型</td></tr>
+          <tr><td><code>o4-mini</code></td><td>OpenAI</td><td>200K</td><td>快速推理，成本更低</td></tr>
+          <tr><td><code>claude-opus-4-7</code></td><td>Anthropic</td><td>200K</td><td>Claude 旗舰模型</td></tr>
+          <tr><td><code>claude-sonnet-4-6</code></td><td>Anthropic</td><td>200K</td><td>性能与速度的平衡</td></tr>
+          <tr><td><code>claude-haiku-4-5</code></td><td>Anthropic</td><td>200K</td><td>极速响应</td></tr>
+          <tr><td><code>gemini-2.5-pro</code></td><td>Google</td><td>1M</td><td>超长上下文推理</td></tr>
+          <tr><td><code>gemini-2.5-flash</code></td><td>Google</td><td>1M</td><td>高速响应版</td></tr>
+          <tr><td><code>deepseek-v3</code></td><td>DeepSeek</td><td>128K</td><td>国产开源旗舰</td></tr>
+          <tr><td><code>deepseek-r1</code></td><td>DeepSeek</td><td>128K</td><td>深度思考推理</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 图像生成模型</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>模型 ID</th><th>提供商</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>dall-e-3</code></td><td>OpenAI</td><td>高质量图像生成</td></tr>
+          <tr><td><code>midjourney</code></td><td>Midjourney</td><td>艺术风格图像生成</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>💡 提示：</strong>可使用 <code>GET /v1/models</code> 接口获取当前可用的完整模型列表。更多模型持续接入中，请关注更新。
+  </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="doc-section" id="pricing">
+  <h2 class="section-title"><span class="hash">#</span> 额度与计费</h2>
+  <p class="section-desc">因果API 采用按量计费模式，不同模型有不同的计费倍率。</p>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 计费规则</h3>
+    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+      <li>账户充值后获得余额（人民币），1 元对应一定额度</li>
+      <li>不同模型有不同倍率，具体以控制台实时显示为准</li>
+      <li>费用 =（输入 Token × 输入价格 + 输出 Token × 输出价格）× 倍率</li>
+      <li>在控制台 → 日志中可查看每次请求的详细扣费记录</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> Token 估算参考</h3>
+    <div class="card">
+      <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+        <li>英文：1 Token ≈ 0.75 个单词 / 约 4 个字符</li>
+        <li>中文：1 Token ≈ 1 个汉字</li>
+        <li>代码：1 Token ≈ 3~4 个字符</li>
+        <li>一篇 1000 字的中文文章 ≈ 1000 tokens</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BEST PRACTICES ===== -->
+<section class="doc-section" id="best-practices">
+  <h2 class="section-title"><span class="hash">#</span> 最佳实践</h2>
+  <p class="section-desc">遵循以下建议，获得更安全、高效的使用体验。</p>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 安全建议</h3>
+    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+      <li><strong>不要</strong>在前端代码中直接暴露 API Key——始终通过后端代理转发</li>
+      <li>为不同环境创建独立的令牌（开发 / 测试 / 生产）</li>
+      <li>启用 IP 白名单，限制可访问的来源 IP</li>
+      <li>定期轮换 API Key，降低泄露风险</li>
+      <li>设置合理的额度上限，防止意外超支</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 性能优化</h3>
+    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+      <li>使用流式输出（<code>stream: true</code>）减少首字等待时间</li>
+      <li>合理设置 <code>max_tokens</code>，避免不必要的长输出</li>
+      <li>复用 HTTP 连接（Keep-Alive），减少握手开销</li>
+      <li>请求失败时实现指数退避重试策略</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ===== AUTH ===== -->
+<section class="doc-section" id="auth">
+  <h2 class="section-title"><span class="hash">#</span> 鉴权方式</h2>
+  <p class="section-desc">所有 API 请求均需在 Header 中携带 API Key 进行身份验证。</p>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> Bearer Token（推荐）</h3>
+    <p style="color:var(--text-secondary)">在 HTTP Header 中添加 <code>Authorization</code> 字段，与 OpenAI 官方完全一致：</p>
+    <div class="code-block">
+      <span class="lang-tag">http</span>
+      <pre>Authorization: Bearer YOUR_API_KEY</pre>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>⚠️ 注意：</strong>鉴权失败时返回 <code>401 Unauthorized</code>。请检查 Key 是否正确、是否已过期、额度是否已耗尽。
+  </div>
+</section>
+
+<!-- ===== CHAT COMPLETIONS ===== -->
+<section class="doc-section" id="chat-completions">
+  <h2 class="section-title"><span class="hash">#</span> 聊天补全</h2>
+  <p class="section-desc">核心对话接口，兼容 OpenAI Chat Completions API 格式。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/chat/completions</code>
+    </div>
+    <p style="color:var(--text-secondary);font-size:14px;">向 AI 模型发送对话消息并获取回复。</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>✅</td><td>模型 ID，如 <code>gpt-4o</code></td></tr>
+          <tr><td><code>messages</code></td><td>array</td><td>✅</td><td>对话消息列表，每条含 <code>role</code> 和 <code>content</code></td></tr>
+          <tr><td><code>temperature</code></td><td>number</td><td>—</td><td>采样温度 0~2，默认 1。越高越随机</td></tr>
+          <tr><td><code>top_p</code></td><td>number</td><td>—</td><td>核采样 0~1，默认 1</td></tr>
+          <tr><td><code>max_tokens</code></td><td>integer</td><td>—</td><td>最大输出 Token 数</td></tr>
+          <tr><td><code>stream</code></td><td>boolean</td><td>—</td><td>是否流式输出，默认 false</td></tr>
+          <tr><td><code>stop</code></td><td>string/array</td><td>—</td><td>停止词，遇到即停止生成</td></tr>
+          <tr><td><code>tools</code></td><td>array</td><td>—</td><td>函数调用工具定义</td></tr>
+          <tr><td><code>tool_choice</code></td><td>string/object</td><td>—</td><td>工具调用策略</td></tr>
+          <tr><td><code>response_format</code></td><td>object</td><td>—</td><td>输出格式，如 JSON 模式</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 消息角色</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>角色</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>system</code></td><td>系统提示词，设定助手行为与角色</td></tr>
+          <tr><td><code>user</code></td><td>用户消息</td></tr>
+          <tr><td><code>assistant</code></td><td>助手回复（多轮对话中回传）</td></tr>
+          <tr><td><code>tool</code></td><td>工具调用结果</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 流式输出</h3>
+    <p style="color:var(--text-secondary)">设置 <code>"stream": true</code> 启用 SSE（Server-Sent Events）流式输出：</p>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "讲个故事"}],
+    stream=True
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="")</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 响应格式</h3>
+    <div class="code-block">
+      <span class="lang-tag">json</span>
+      <pre>{
+  "id": "chatcmpl-xxxxxxxx",
+  "object": "chat.completion",
+  "created": 1700000000,
+  "model": "gpt-4o",
+  "choices": [{
+    "index": 0,
+    "message": {
+      "role": "assistant",
+      "content": "你好！我是因果API 助手..."
+    },
+    "finish_reason": "stop"
+  }],
+  "usage": {
+    "prompt_tokens": 20,
+    "completion_tokens": 15,
+    "total_tokens": 35
+  }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== IMAGE GEN ===== -->
+<section class="doc-section" id="image-gen">
+  <h2 class="section-title"><span class="hash">#</span> 图像生成</h2>
+  <p class="section-desc">兼容 OpenAI Images API 格式，通过文本描述生成图像。</p>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="method method-post">POST</span> <code>/v1/images/generations</code>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 请求参数</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>✅</td><td>模型 ID，如 <code>dall-e-3</code></td></tr>
+          <tr><td><code>prompt</code></td><td>string</td><td>✅</td><td>图像描述文本</td></tr>
+          <tr><td><code>n</code></td><td>integer</td><td>—</td><td>生成数量，默认 1</td></tr>
+          <tr><td><code>size</code></td><td>string</td><td>—</td><td>图像尺寸，如 <code>1024x1024</code></td></tr>
+          <tr><td><code>quality</code></td><td>string</td><td>—</td><td>质量：<code>standard</code> / <code>hd</code></td></tr>
+          <tr><td><code>style</code></td><td>string</td><td>—</td><td>风格：<code>vivid</code> / <code>natural</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 调用示例</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>response = client.images.generate(
+    model="dall-e-3",
+    prompt="一只坐在电脑前的橘猫，赛博朋克风格",
+    n=1,
+    size="1024x1024"
+)
+
+print(response.data[0].url)</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ERROR CODES ===== -->
+<section class="doc-section" id="error-codes">
+  <h2 class="section-title"><span class="hash">#</span> 错误码</h2>
+  <p class="section-desc">API 使用标准 HTTP 状态码，并在响应体中返回详细错误说明。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>状态码</th><th>错误类型</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">400</span></td><td><code>invalid_request_error</code></td><td>请求参数有误，请检查格式</td></tr>
+        <tr><td><span class="badge badge-red">401</span></td><td><code>authentication_error</code></td><td>API Key 无效或缺失</td></tr>
+        <tr><td><span class="badge badge-red">402</span></td><td><code>insufficient_quota</code></td><td>余额不足或令牌额度已耗尽</td></tr>
+        <tr><td><span class="badge badge-red">403</span></td><td><code>permission_error</code></td><td>无权访问该模型或资源</td></tr>
+        <tr><td><span class="badge badge-red">404</span></td><td><code>not_found_error</code></td><td>请求的资源不存在</td></tr>
+        <tr><td><span class="badge badge-red">429</span></td><td><code>rate_limit_error</code></td><td>请求频率超限，请稍后重试</td></tr>
+        <tr><td><span class="badge badge-red">500</span></td><td><code>server_error</code></td><td>服务器内部错误，可稍后重试或联系支持</td></tr>
+        <tr><td><span class="badge badge-red">503</span></td><td><code>service_unavailable</code></td><td>服务暂时不可用</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 错误响应示例</h3>
+    <div class="code-block">
+      <span class="lang-tag">json</span>
+      <pre>{
+  "error": {
+    "message": "API Key 无效",
+    "type": "authentication_error",
+    "code": "invalid_api_key"
+  }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RATE LIMIT ===== -->
+<section class="doc-section" id="rate-limit">
+  <h2 class="section-title"><span class="hash">#</span> 速率限制</h2>
+  <p class="section-desc">为保证服务稳定，因果API 对 API 调用实施速率限制。</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>限制维度</th><th>默认值</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>每令牌 RPM</td><td>60 次/分钟</td><td>单个令牌每分钟最大请求数</td></tr>
+        <tr><td>每令牌 TPM</td><td>100,000 tokens/分钟</td><td>单个令牌每分钟最大 Token 消耗</td></tr>
+        <tr><td>并发连接数</td><td>10</td><td>单个令牌同时进行的请求数</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-tip">
+    <strong>💡 提示：</strong>如需更高的速率限制，请联系管理员调整。
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 处理限流响应</h3>
+    <p style="color:var(--text-secondary)">触发限流时返回 <code>429</code>，建议实现指数退避重试：</p>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>import time, random
+
+def call_with_retry(client, max_retries=5, **kwargs):
+    for attempt in range(max_retries):
+        try:
+            return client.chat.completions.create(**kwargs)
+        except Exception as e:
+            if getattr(e, 'status_code', None) == 429:
+                wait = (2 ** attempt) + random.uniform(0, 1)
+                print(f"限流，{wait:.1f}s 后重试...")
+                time.sleep(wait)
+            else:
+                raise
+    raise Exception("达到最大重试次数")</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="doc-section" id="faq">
+  <h2 class="section-title"><span class="hash">#</span> 常见问题</h2>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 和 OpenAI 官方的区别是什么？</h3>
+    <p style="color:var(--text-secondary)">因果API 完全兼容 OpenAI API 格式，只需改 <code>base_url</code>。核心优势：一个 Key 调用多个模型供应商、更低的价格、中文客服支持。</p>
+  </div>
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 支持哪些支付方式？</h3>
+    <p style="color:var(--text-secondary)">支持支付宝、微信支付在线充值。如有大额或企业对公需求请联系客服。</p>
+  </div>
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 如何查看我的使用量？</h3>
+    <p style="color:var(--text-secondary)">登录控制台 → 日志页面，可查看每次请求的模型、Token 消耗、费用等详细信息。</p>
+  </div>
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> API Key 泄露了怎么办？</h3>
+    <p style="color:var(--text-secondary)">立即登录控制台 → 令牌管理，删除泄露的令牌并创建新的。建议定期轮换。</p>
+  </div>
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 支持 Claude / Gemini 的原生格式吗？</h3>
+    <p style="color:var(--text-secondary)">当前统一使用 OpenAI 兼容格式。使用 OpenAI SDK 将 <code>base_url</code> 指向因果API 即可调用所有支持模型。</p>
+  </div>
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 数据传输是否加密？</h3>
+    <p style="color:var(--text-secondary)">所有 API 通信均通过 HTTPS 加密传输。</p>
+  </div>
+</section>
+
+<!-- ===== CHANGELOG ===== -->
+<section class="doc-section" id="changelog">
+  <h2 class="section-title"><span class="hash">#</span> 更新日志</h2>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> v1.0 初始版本</h3>
+    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+      <li>支持 OpenAI Chat Completions 兼容接口</li>
+      <li>支持 GPT-4o、Claude、Gemini、DeepSeek 等主流模型</li>
+      <li>API Key 管理与额度控制系统</li>
+      <li>流式输出（SSE）支持</li>
+      <li>图像生成接口</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 即将推出</h3>
+    <ul style="list-style:disc;padding-left:20px;color:var(--text-secondary);line-height:2.2;">
+      <li>更多模型接入（Midjourney、Suno 等）</li>
+      <li>Function Calling / Tools 增强</li>
+      <li>WebSocket 实时对话</li>
+      <li>用量统计仪表板</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<script>
+// Sidebar section toggle
+function toggleSection(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+
+// Mobile sidebar
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-backdrop').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.querySelector('.sidebar-backdrop').classList.remove('show');
+}
+
+// Active nav on scroll
+const sections = document.querySelectorAll('.doc-section');
+const navLinks = document.querySelectorAll('.nav-item a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// Copy code
+function copyCode(btn) {
+  const pre = btn.parentElement.querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '已复制!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
+}
+
+// Search
+function searchDocs(query) {
+  const q = query.toLowerCase().trim();
+  // Reset highlights
+  document.querySelectorAll('.search-highlight').forEach(el => {
+    el.outerHTML = el.textContent;
+  });
+
+  if (!q) {
+    // Show all sections
+    document.querySelectorAll('.nav-item').forEach(el => el.style.display = '');
+    document.querySelectorAll('.nav-section').forEach(el => el.style.display = '');
+    return;
+  }
+
+  // Search in nav items
+  let hasResults = false;
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const a = item.querySelector('a');
+    const searchData = (a.dataset.search || '') + ' ' + a.textContent;
+    if (searchData.toLowerCase().includes(q)) {
+      item.style.display = '';
+      item.closest('.nav-section').style.display = '';
+      hasResults = true;
+    } else {
+      item.style.display = 'none';
+    }
+  });
+
+  // Hide empty sections
+  document.querySelectorAll('.nav-section').forEach(section => {
+    const visibleItems = section.querySelectorAll('.nav-item[style*="display: none"]');
+    if (visibleItems.length === section.querySelectorAll('.nav-item').length) {
+      section.style.display = 'none';
+    } else {
+      section.style.display = '';
+      section.classList.remove('collapsed');
+    }
+  });
+
+  // Highlight in content
+  if (q) {
+    const main = document.querySelector('.main');
+    const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, null, false);
+    const textNodes = [];
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+    textNodes.forEach(node => {
+      const text = node.textContent.toLowerCase();
+      const idx = text.indexOf(q);
+      if (idx !== -1 && node.parentElement && !['SCRIPT','STYLE','PRE','CODE'].includes(node.parentElement.tagName)) {
+        const span = document.createElement('span');
+        span.className = 'search-highlight';
+        const range = document.createRange();
+        range.setStart(node, idx);
+        range.setEnd(node, idx + q.length);
+        range.surroundContents(span);
+      }
+    });
+  }
+}
+</script>
+
+</body>
+</html>
