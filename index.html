@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>因果API API 文档</title>
+<title>因果API 文档</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -731,7 +731,7 @@ td code, th code {
 
   <div class="sidebar-footer">
     <a href="https://causmatrix.xyz">← 返回首页</a>
-    <a href="https://github.com" target="_blank">GitHub</a>
+    <a href="https://github.com/jkpter/causmatrix-docs" target="_blank">GitHub</a>
     <a href="mailto:support@causmatrix.xyz">联系支持</a>
   </div>
 </aside>
@@ -801,14 +801,15 @@ td code, th code {
     </li>
     <li>
       <strong>发起调用</strong><br>
-      将 <code>base_url</code> 设为 <code>https://causmatrix.xyz/v1</code>，搭配你的 API Key 即可调用。
+      将 <code>base_url</code> 设为 <code>https://api.causmatrix.xyz/v1</code>，搭配你的 API Key 即可调用。
     </li>
   </ol>
 
   <div class="card">
     <div class="card-title">📋 连接信息</div>
     <table>
-      <tr><td style="width:140px;font-weight:500;">API 地址</td><td><code>https://causmatrix.xyz</code></td></tr>
+      <tr><td style="width:140px;font-weight:500;">OpenAI API 地址</td><td><code>https://api.causmatrix.xyz/v1</code></td></tr>
+      <tr><td style="font-weight:500;">Gemini API 地址</td><td><code>https://gemini.causmatrix.xyz</code></td></tr>
       <tr><td style="font-weight:500;">接口格式</td><td>OpenAI 兼容（Chat Completions / Images）</td></tr>
       <tr><td style="font-weight:500;">鉴权方式</td><td><code>Authorization: Bearer &lt;API-Key&gt;</code></td></tr>
     </table>
@@ -819,7 +820,7 @@ td code, th code {
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">bash</span>
-      <pre>curl https://causmatrix.xyz/v1/chat/completions \
+      <pre>curl https://api.causmatrix.xyz/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -d '{
@@ -841,7 +842,7 @@ td code, th code {
 
 client = OpenAI(
     api_key="YOUR_API_KEY",
-    base_url="https://causmatrix.xyz/v1"
+    base_url="https://api.causmatrix.xyz/v1"
 )
 
 response = client.chat.completions.create(
@@ -865,7 +866,7 @@ print(response.choices[0].message.content)</pre>
 
 const client = new OpenAI({
   apiKey: "YOUR_API_KEY",
-  baseURL: "https://causmatrix.xyz/v1"
+  baseURL: "https://api.causmatrix.xyz/v1"
 });
 
 const response = await client.chat.completions.create({
@@ -885,7 +886,7 @@ console.log(response.choices[0].message.content);</pre>
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">bash</span>
-      <pre>export GOOGLE_GEMINI_BASE_URL="https://causmatrix.xyz"
+      <pre>export GOOGLE_GEMINI_BASE_URL="https://gemini.causmatrix.xyz"
 export GEMINI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export GEMINI_MODEL="gemini-2.0-flash"  # 如有 Gemini 3 权限可填：gemini-3-pro-preview</pre>
     </div>
