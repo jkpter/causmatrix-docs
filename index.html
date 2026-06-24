@@ -711,6 +711,7 @@ td code, th code {
       <ul class="nav-items">
         <li class="nav-item"><a href="#auth" data-search="鉴权 认证 authorization bearer key">鉴权方式</a></li>
         <li class="nav-item"><a href="#chat-completions" data-search="聊天补全 chat completions 对话 API">聊天补全</a></li>
+        <li class="nav-item"><a href="#gemini-native" data-search="Gemini 原生格式 generateContent streamGenerateContent">Gemini 原生格式</a></li>
         <li class="nav-item"><a href="#image-gen" data-search="图像生成 image 画图 dalle">图像生成</a></li>
         <li class="nav-item"><a href="#error-codes" data-search="错误码 error 400 401 429 500">错误码</a></li>
         <li class="nav-item"><a href="#rate-limit" data-search="速率限制 rate limit 限流 429">速率限制</a></li>
@@ -809,8 +810,8 @@ td code, th code {
     <div class="card-title">📋 连接信息</div>
     <table>
       <tr><td style="width:140px;font-weight:500;">OpenAI API 地址</td><td><code>https://api.causmatrix.xyz/v1</code></td></tr>
-      <tr><td style="font-weight:500;">Gemini API 地址</td><td><code>https://gemini.causmatrix.xyz</code></td></tr>
-      <tr><td style="font-weight:500;">接口格式</td><td>OpenAI 兼容（Chat Completions / Images）</td></tr>
+      <tr><td style="font-weight:500;">Gemini API 地址</td><td><code>https://api.causmatrix.xyz/v1beta</code></td></tr>
+      <tr><td style="font-weight:500;">接口格式</td><td>OpenAI 兼容 + Gemini 原生格式</td></tr>
       <tr><td style="font-weight:500;">鉴权方式</td><td><code>Authorization: Bearer &lt;API-Key&gt;</code></td></tr>
     </table>
   </div>
@@ -882,18 +883,18 @@ console.log(response.choices[0].message.content);</pre>
   </div>
   <div class="subsection">
     <h3 class="subsection-title"><span class="hash">#</span> Gemini 配置</h3>
-    <p style="color:var(--text-secondary)">使用 Gemini 模型时，推荐设置以下环境变量：</p>
+    <p style="color:var(--text-secondary)">因果API 同时支持 Gemini 原生 API 格式。使用 Google 官方 Gemini SDK 或原生 API 时，推荐设置以下环境变量：</p>
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">bash</span>
-      <pre>export GOOGLE_GEMINI_BASE_URL="https://gemini.causmatrix.xyz"
+      <pre>export GOOGLE_GEMINI_BASE_URL="https://api.causmatrix.xyz/v1beta"
 export GEMINI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export GEMINI_MODEL="gemini-2.0-flash"  # 如有 Gemini 3 权限可填：gemini-3-pro-preview</pre>
+export GEMINI_MODEL="gemini-2.5-flash"</pre>
     </div>
     <div class="code-block">
       <span class="copy-btn" onclick="copyCode(this)">复制</span>
       <span class="lang-tag">bash</span>
-      <pre>curl https://gemini.causmatrix.xyz/v1/models/gemini-2.0-flash:generateContent \
+      <pre>curl "https://api.causmatrix.xyz/v1beta/models/gemini-2.5-flash:generateContent" \
   -H "Content-Type: application/json" \
   -H "x-goog-api-key: YOUR_GEMINI_API_KEY" \
   -d '{
@@ -972,10 +973,13 @@ export GEMINI_MODEL="gemini-2.0-flash"  # 如有 Gemini 3 权限可填：gemini-
           <tr><td><code>claude-opus-4-7</code></td><td>Anthropic</td><td>200K</td><td>Claude 旗舰模型</td></tr>
           <tr><td><code>claude-sonnet-4-6</code></td><td>Anthropic</td><td>200K</td><td>性能与速度的平衡</td></tr>
           <tr><td><code>claude-haiku-4-5</code></td><td>Anthropic</td><td>200K</td><td>极速响应</td></tr>
-          <tr><td><code>gemini-2.0-flash</code></td><td>Google</td><td>1M</td><td>高速响应版</td></tr>
-          <tr><td><code>gemini-3-pro-preview</code></td><td>Google</td><td>1M</td><td>最新旗舰推理模型</td></tr>
+          <tr><td><code>gemini-2.5-pro</code></td><td>Google</td><td>1M</td><td>超长上下文推理</td></tr>
+          <tr><td><code>gemini-2.5-flash</code></td><td>Google</td><td>1M</td><td>高速响应版</td></tr>
+          <tr><td><code>gemini-2.0-flash</code></td><td>Google</td><td>1M</td><td>稳定快速版</td></tr>
+          <tr><td><code>gemini-3-pro-preview</code></td><td>Google</td><td>1M</td><td>最新旗舰推理模型（预览版）</td></tr>
           <tr><td><code>deepseek-v3</code></td><td>DeepSeek</td><td>128K</td><td>国产开源旗舰</td></tr>
           <tr><td><code>deepseek-r1</code></td><td>DeepSeek</td><td>128K</td><td>深度思考推理</td></tr>
+          <tr><td><code>deepseek-v3.1</code></td><td>DeepSeek</td><td>128K</td><td>最新旗舰增强版</td></tr>
         </tbody>
       </table>
     </div>
@@ -995,7 +999,7 @@ export GEMINI_MODEL="gemini-2.0-flash"  # 如有 Gemini 3 权限可填：gemini-
   </div>
 
   <div class="alert alert-info">
-    <strong>💡 提示：</strong>可使用 <code>GET /v1/models</code> 接口获取当前可用的完整模型列表。更多模型持续接入中，请关注更新。
+    <strong>💡 提示：</strong>可使用 <code>GET /v1/models</code>（OpenAI格式）或 <code>GET /v1beta/models</code>（Gemini原生格式）接口获取当前可用的完整模型列表。更多模型持续接入中，请关注更新。
   </div>
 </section>
 
@@ -1165,6 +1169,153 @@ for chunk in stream:
   }
 }</pre>
     </div>
+  </div>
+</section>
+
+<!-- ===== GEMINI NATIVE ===== -->
+<section class="doc-section" id="gemini-native">
+  <h2 class="section-title"><span class="hash">#</span> Gemini 原生格式</h2>
+  <p class="section-desc">因果API 兼容 Google Gemini 原生 API 格式。使用 Gemini 模型时，可选用此格式调用，享受 Gemini 特有的功能特性（如 Grounding、Thinking 等）。</p>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 列出模型</h3>
+    <div class="card">
+      <div class="card-title">
+        <span class="method method-get">GET</span> <code>/v1beta/models</code>
+      </div>
+      <p style="color:var(--text-secondary);font-size:14px;">返回当前可用模型列表（Gemini 原生响应格式）。</p>
+    </div>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl "https://api.causmatrix.xyz/v1beta/models" \
+  -H "x-goog-api-key: YOUR_API_KEY"</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 生成内容</h3>
+    <div class="card">
+      <div class="card-title">
+        <span class="method method-post">POST</span> <code>/v1beta/models/{model}:generateContent</code>
+      </div>
+      <p style="color:var(--text-secondary);font-size:14px;">向指定 Gemini 模型发送内容并获取生成结果。</p>
+    </div>
+
+    <h4 style="font-weight:600;font-size:14px;color:var(--text);margin:18px 0 8px;">请求参数</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>参数</th><th>类型</th><th>必填</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><code>model</code></td><td>string</td><td>✅</td><td>路径参数，模型 ID，如 <code>gemini-2.5-flash</code></td></tr>
+          <tr><td><code>contents</code></td><td>array</td><td>✅</td><td>对话内容数组，每项含 <code>parts</code> 和可选的 <code>role</code></td></tr>
+          <tr><td><code>systemInstruction</code></td><td>object</td><td>—</td><td>系统指令，格式同 <code>contents</code></td></tr>
+          <tr><td><code>generationConfig</code></td><td>object</td><td>—</td><td>生成配置，含 <code>temperature</code>、<code>topP</code>、<code>maxOutputTokens</code> 等</td></tr>
+          <tr><td><code>tools</code></td><td>array</td><td>—</td><td>工具定义，如 Google Search grounding</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 流式生成</h3>
+    <div class="card">
+      <div class="card-title">
+        <span class="method method-post">POST</span> <code>/v1beta/models/{model}:streamGenerateContent</code>
+      </div>
+      <p style="color:var(--text-secondary);font-size:14px;">SSE 流式输出，参数与 <code>generateContent</code> 相同。</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 鉴权方式</h3>
+    <p style="color:var(--text-secondary)">Gemini 原生格式支持两种鉴权方式：</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>方式</th><th>Header</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>x-goog-api-key</td><td><code>x-goog-api-key: YOUR_API_KEY</code></td><td>与 Google 官方一致，推荐</td></tr>
+          <tr><td>Bearer Token</td><td><code>Authorization: Bearer YOUR_API_KEY</code></td><td>与 OpenAI 格式统一</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 调用示例</h3>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl "https://api.causmatrix.xyz/v1beta/models/gemini-2.5-flash:generateContent" \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: YOUR_API_KEY" \
+  -d '{
+    "systemInstruction": {
+      "parts": [{"text": "你是一个有帮助的助手。"}]
+    },
+    "contents": [
+      {
+        "role": "user",
+        "parts": [{"text": "你好，请介绍一下自己。"}]
+      }
+    ],
+    "generationConfig": {
+      "temperature": 0.7,
+      "maxOutputTokens": 1024
+    }
+  }'</pre>
+    </div>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">python</span>
+      <pre>import os
+from google import genai
+
+client = genai.Client(
+    api_key=os.environ["GEMINI_API_KEY"],
+    http_options={"base_url": "https://api.causmatrix.xyz/v1beta"}
+)
+
+response = client.models.generate_content(
+    model="gemini-2.5-flash",
+    contents="你好，请介绍一下自己。",
+    config={
+        "system_instruction": "你是一个有帮助的助手。",
+        "temperature": 0.7,
+        "max_output_tokens": 1024,
+    }
+)
+
+print(response.text)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title"><span class="hash">#</span> 响应格式</h3>
+    <div class="code-block">
+      <span class="lang-tag">json</span>
+      <pre>{
+  "candidates": [{
+    "content": {
+      "parts": [{"text": "你好！我是 Gemini 助手..."}],
+      "role": "model"
+    },
+    "finishReason": "STOP",
+    "safetyRatings": [
+      {"category": "HARM_CATEGORY_HARASSMENT", "probability": "NEGLIGIBLE"}
+    ]
+  }],
+  "usageMetadata": {
+    "promptTokenCount": 10,
+    "candidatesTokenCount": 20,
+    "totalTokenCount": 30
+  }
+}</pre>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>💡 提示：</strong>Gemini 原生格式保留 Google Gemini API 的全部特性，包括 <code>thinking</code> 推理模式、<code>grounding</code> 搜索增强等功能。具体参数请参考 <a href="https://ai.google.dev/gemini-api/docs" target="_blank">Google Gemini API 官方文档</a>。
   </div>
 </section>
 
