@@ -890,6 +890,22 @@ console.log(response.choices[0].message.content);</pre>
 export GEMINI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export GEMINI_MODEL="gemini-2.0-flash"  # 如有 Gemini 3 权限可填：gemini-3-pro-preview</pre>
     </div>
+    <div class="code-block">
+      <span class="copy-btn" onclick="copyCode(this)">复制</span>
+      <span class="lang-tag">bash</span>
+      <pre>curl https://gemini.causmatrix.xyz/v1/models/gemini-2.0-flash:generateContent \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: YOUR_GEMINI_API_KEY" \
+  -d '{
+    "contents": [
+      {
+        "parts": [
+          {"text": "你好，请介绍一下自己。"}
+        ]
+      }
+    ]
+  }'</pre>
+    </div>
   </div>
 </section>
 
